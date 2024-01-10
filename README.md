@@ -1,0 +1,77 @@
+# Sesame - Taiga Crawler
+
+Le Sesame - Taiga Crawler est un projet Python qui interagit avec l'API Taiga pour effectuer des tâches spécifiques.
+
+## Table des matières
+
+- [Aperçu](#aperçu)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Utilisation](#utilisation)
+- [Contributions](#contributions)
+- [Licence](#licence)
+
+## Aperçu
+
+Le Sesame - Taiga Crawler est conçu pour effectuer des tâches liées à l'API Taiga. Il comprend des fonctionnalités telles que la vérification AmoinsB et l'exportation de données individuelles. Le projet est structuré avec des composants modulaires et utilise la programmation asynchrone pour l'efficacité.
+
+## Installation
+
+1. Requis :
+   - Python 3
+   - PIP
+
+2. Clonez le dépôt :
+
+    ```bash
+    git clone https://github.com/libertech-fr/sesame-taiga_crawler.git
+    cd taiga-crawler
+    ```
+
+3. Installez les dépendances :
+
+    ```bash
+    make install-deps
+    ```
+
+## Configuration
+
+1. Créez un fichier `.env` à la racine du projet et ajoutez la configuration suivante :
+
+    ```dotenv
+    STC_API_BASEURL=https://taiga.archi.fr
+    STC_API_USERNAME=votre_nom_utilisateur_taiga_api
+    STC_API_PASSWORD=votre_mot_de_passe_taiga_api
+    STC_API_PASSENSA=votre_préfixe_mot_de_passe_ensa
+    STC_API_CODEENSA=lyon
+    ```
+
+    Assurez-vous de remplacer les valeurs fictives par vos informations réelles.
+
+## Utilisation
+
+1. Mise en route
+   
+   !!! ATTENTION !!!
+   Vous êtes sur la machine authorisée par L'API Taiga : Alors ignorez cette étape !!!
+   
+   ```bash
+   make taiga-forward
+   ```
+   
+2. Exécution du script
+
+   Exécutez le script principal :
+   
+   ```bash
+   make run-crawler
+   ```
+
+## Développement
+
+Vous pouvez utiliser Pycharm avec la Makefile extension, le débuggeur est automatiquement configuré !
+
+- Mise à jour des requirements :
+   ```bash
+   make update-reqs
+   ```
