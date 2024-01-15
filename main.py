@@ -44,6 +44,24 @@ collections = [
             "id": "*",
         },
     },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "adm",
+            "id": "*",
+        },
+    },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "esn",
+            "id": "*",
+        },
+    },
 ]
 
 
