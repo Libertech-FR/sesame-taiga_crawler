@@ -4,12 +4,13 @@ Le Sesame - Taiga Crawler est un projet Python qui interagit avec l'API Taiga po
 
 ## Table des matières
 
-- [Aperçu](#aperçu)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Utilisation](#utilisation)
-- [Contributions](#contributions)
-- [Licence](#licence)
+- [Sesame - Taiga Crawler](#sesame---taiga-crawler)
+  - [Table des matières](#table-des-matières)
+  - [Aperçu](#aperçu)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Utilisation](#utilisation)
+  - [Développement](#développement)
 
 ## Aperçu
 
@@ -44,6 +45,8 @@ Le Sesame - Taiga Crawler est conçu pour effectuer des tâches liées à l'API 
     STC_API_PASSWORD=[PASSWORD_DE_L_API]
     STC_API_FORWARD_PORT=1337
     STC_API_PASSENSA=[PASSWORD_ENSA]
+
+    SESAME_API_BASEURL=http://[URL_DU_SERVEUR_AUTHORISE]:4002
     ```
 
     Assurez-vous de remplacer les valeurs fictives par vos informations réelles.
