@@ -7,7 +7,6 @@ import dotenv
 
 dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
-sem = asyncio.Semaphore(50)
 
 configs = {
     "taiga_etd.json": {
@@ -134,7 +133,7 @@ async def process_data(data, config, file, session):
     with open(f'./data/{file}', 'w', encoding='utf-8') as fichier:
         json.dump(result, fichier, ensure_ascii=False)
     tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert', entry) for entry in result]
-    await gather_with_concurrency(10, tasks)
+    await gather_with_concurrency(25, tasks)
     print(f"Processed {file}")
 
 async def import_ind():
@@ -145,5 +144,7 @@ async def import_ind():
             datas[file] = json.load(fichier).get('data')
 
     async with aiohttp.ClientSession() as session:
-        for file in cache_files:
-            await process_data(datas[file], configs[file], file, session)
+        # for file in cache_files:
+        #     await process_data(datas[file], configs[file], file, session)
+        tasks = [process_data(datas[file], configs[file], file, session) for file in cache_files]
+        await gather_with_concurrency(10, tasks)
