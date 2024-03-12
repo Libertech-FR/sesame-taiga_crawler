@@ -8,9 +8,8 @@ help:
 	@grep -E '^[-a-zA-Z0-9_\.\/]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) \
 		| sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[32m%-15s\033[0m %s\n", $$1, $$2}'
 
-
 run-crawler: ## Lance le crawler Sesame - Taiga avec python !
-	@python main.py
+	@python3 main.py
 
 install-deps: ## Installe les dépendances python
 	@printf "\033[33mPIP:\033[0m install required dependencies ...\n"
@@ -18,11 +17,11 @@ install-deps: ## Installe les dépendances python
 	@printf "\033[33mPIP:\033[0m SUCCESSFUL !!!\n"
 
 taiga-forward: ## Transfert les appels de l'API Taiga via un proxy socks au travers du serveur sesame (à utiliser pour lancer le script à distance)
-	@printf "\033[33mNCAT:\033[0m Launch forwarding tcp requests ...\n"
-	@ssh libertech@193.52.197.92 "pkill -f 'ncat taiga.archi.fr 443'" || true
+	@printf "\033[33mNCAT:\033[0m Launch forwarding tcp requests for <$(STC_API_HOST)> ...\n"
+	@ssh libertech@193.52.197.92 "pkill -f 'ncat $(STC_API_HOST) 443'" || true
 	@ssh libertech@193.52.197.92 "ncat --keep-open --no-shutdown -v \
-		--sh-exec 'ncat taiga.archi.fr 443' \
-		-l 1337"
+		--sh-exec 'ncat $(STC_API_HOST) 443' \
+		-l $(STC_API_FORWARD_PORT)"
 	@printf "\033[33mNCAT:\033[0m End of forwarding requests !\n"
 
 update-reqs: ## Met à jour la liste des dépendances python

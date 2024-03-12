@@ -39,15 +39,17 @@ Le Sesame - Taiga Crawler est conçu pour effectuer des tâches liées à l'API 
 1. Créez un fichier `.env` à la racine du projet et ajoutez la configuration suivante :
 
     ```dotenv
-    STC_API_BASEURL=https://taiga.archi.fr
-    STC_API_USERNAME=votre_nom_utilisateur_taiga_api
-    STC_API_PASSWORD=votre_mot_de_passe_taiga_api
-    STC_API_PASSENSA=votre_préfixe_mot_de_passe_ensa
-    STC_API_CODEENSA=lyon
+    STC_API_BASEURL=https://[URL_DU_SERVEUR_AUTHORISE]:1337
+    STC_API_USERNAME=[IDENTIFIANT_DE_L_API]
+    STC_API_PASSWORD=[PASSWORD_DE_L_API]
+    STC_API_FORWARD_PORT=1337
+    STC_API_PASSENSA=[PASSWORD_ENSA]
     ```
 
     Assurez-vous de remplacer les valeurs fictives par vos informations réelles.
 
+    - **STC_API_BASEURL** : Peut être vide si vous lancez le logiciel depuis le serveur autorisé
+    - **STC_API_FORWARD_PORT** : Non requis si `make taiga-forward` n'est pas utilisé
 ## Utilisation
 
 1. Mise en route

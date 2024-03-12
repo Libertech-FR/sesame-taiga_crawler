@@ -44,7 +44,7 @@ collections = [
             "id": "*",
         },
     },
-        {
+    {
         "function": export_ind,
         "method": "ExportInd",
         "params": {
@@ -53,7 +53,7 @@ collections = [
             "id": "*",
         },
     },
-        {
+    {
         "function": export_ind,
         "method": "ExportInd",
         "params": {
