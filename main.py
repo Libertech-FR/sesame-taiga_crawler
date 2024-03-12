@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 import hashlib
 from datetime import datetime
 
-
 from src.a_moins_b import a_moins_b
 from src.export_ind import export_ind
+from src.import_ind import import_ind
 
 logging.basicConfig(level=logging.INFO)
 logger: logging.Logger = logging.getLogger(__name__)
@@ -44,6 +44,24 @@ collections = [
             "id": "*",
         },
     },
+        {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "adm",
+            "id": "*",
+        },
+    },
+        {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "esn",
+            "id": "*",
+        },
+    },
 ]
 
 
@@ -54,6 +72,8 @@ async def main():
     await asyncio.gather(*collection_tasks)
     print("Taiga crawler ended successful !!!")
 
+    print("Process Data")
+    await import_ind()
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
