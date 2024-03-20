@@ -66,11 +66,11 @@ collections = [
 
 
 async def main():
-    logger.info("Starting Taiga crawler...")
-    await a_moins_b(url, 0, -1, headers)
-    collection_tasks = [col.get('function')(url, col, headers) for col in collections]
-    await asyncio.gather(*collection_tasks)
-    print("Taiga crawler ended successful !!!")
+    # logger.info("Starting Taiga crawler...")
+    # await a_moins_b(url, 0, -1, headers)
+    # collection_tasks = [col.get('function')(url, col, headers) for col in collections]
+    # await asyncio.gather(*collection_tasks)
+    # print("Taiga crawler ended successful !!!")
 
     print("Starting import_ind...")
     start_time = datetime.now()

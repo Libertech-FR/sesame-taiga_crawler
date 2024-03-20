@@ -109,8 +109,15 @@ async def gather_with_concurrency(n, tasks):
     return await asyncio.gather(*[sem_task(task) for task in tasks])
 
 async def send_request(session, url, json):
+    token = os.getenv('SESAME_API_TOKEN')
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json; charset=utf-8",
+    }
+
     try:
-        async with session.post(url, json=json) as response:
+        print(f"json: {json}")
+        async with session.post(url, json=json, headers=headers) as response:
             response.raise_for_status()  # Raises error for 4xx/5xx responses
             print(f"Request to {url} successful: {response.status}")
     except aiohttp.ClientError as e:
@@ -125,7 +132,7 @@ async def get_data(data, config):
         result.append(treated)
     return result
 
-    
+
 
 async def process_data(data, config, file, session):
     print(f"Processing {file}")
