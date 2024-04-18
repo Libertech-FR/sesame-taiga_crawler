@@ -4,99 +4,10 @@ import os
 from data_weaver import weave_entries, weave_entry
 import aiohttp
 import dotenv
+import yaml
 
 dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
-
-configs = {
-    "taiga_etd.json": {
-        "mapping": {
-            "nom": "inetOrgPerson.cn",
-            "prenom": ["inetOrgPerson.sn", "inetOrgPerson.givenName", "additionalFields.attributes.supann.supannPrenomsEtatCivil"],
-            "id_coord": ["inetOrgPerson.uid", "additionalFields.attributes.supann.supannRefId"],
-            "email1": "inetOrgPerson.mail",
-            "tel_mob": "inetOrgPerson.mobile",
-            "adresse": "inetOrgPerson.postalAddress",
-            "mot_de_passe_ldap": "inetOrgPerson.userPassword",
-            "civilite": ["additionalFields.attributes.supann.supanncivilite", "additionalFields.attributes.supann.supannOIDCGenre"],
-            "nom_marital": "additionalFields.attributes.supann.supannNomdeNaissance",
-            "nss_date": "additionalFields.attributes.supann.supannOIDCDatedeNaissance",
-            "nns_pays": "additionalFields.attributes.supann.supannCodeINSEEPaysDeNaissance",
-            "nss_ville": "additionalFields.attributes.supann.supannCodeINSEEVilleDeNaissance",
-            "email2": "additionalFields.attributes.supann.supannAutreMail",
-            #"sesame": "additionalFields.attributes.supann.supannListeRouge",
-            #"outil de messagerie ou sesame ?": "additionalFields.attributes.mailForwardingAddress",
-            #"taiga + sesame": "additionalFields.attributes.supann.supannMailPerso",
-            #"calculé": "additionalFields.attributes.supann.supannRessourceEtatDate",
-            #"saisie": "additionalFields.attributes.supann.supannEntiteAffectationPrincipale"
-        },
-        "additionalFields": {
-            "additionalFields.objectClasses": ["supann"],
-            "additionalFields.attributes.supann.supannTypeEntiteAffectation": "etd",
-            "state": -1,
-        }
-    },
-    "taiga_adm.json": {
-        "mapping": {
-            "nom": "inetOrgPerson.cn",
-            "prenom": ["inetOrgPerson.sn", "inetOrgPerson.givenName", "additionalFields.attributes.supann.supannPrenomsEtatCivil"],
-            "id_coord": ["inetOrgPerson.uid", "additionalFields.attributes.supann.supannEmpId"],
-            "email1": "inetOrgPerson.mail",
-            "tel_mob": "inetOrgPerson.mobile",
-            "adresse": "inetOrgPerson.postalAddress",
-            "mot_de_passe_ldap": "inetOrgPerson.userPassword",
-            "civilite": ["additionalFields.attributes.supann.supanncivilite", "additionalFields.attributes.supann.supannOIDCGenre"],
-            "nom_marital": "additionalFields.attributes.supann.supannNomdeNaissance",
-            "nss_date": "additionalFields.attributes.supann.supannOIDCDatedeNaissance",
-            "nns_pays": "additionalFields.attributes.supann.supannCodeINSEEPaysDeNaissance",
-            "nss_ville": "additionalFields.attributes.supann.supannCodeINSEEVilleDeNaissance",
-            "email2": "additionalFields.attributes.supann.supannAutreMail",
-            #"sesame": "additionalFields.attributes.supann.supannListeRouge",
-            #"outil de messagerie ou sesame ?": "additionalFields.attributes.mailForwardingAddress",
-            #"taiga + sesame": "additionalFields.attributes.supann.supannMailPerso",
-            #"calculé": "additionalFields.attributes.supann.supannRoleGenerique",
-            #"saisie": "additionalFields.attributes.supann.supannParrainDN",
-            #"calcué": "additionalFields.attributes.supann.supannTypeEntiteAffectation",
-            #"": "additionalFields.attributes.supann.supannActivite",
-            #"taiga, sesame ou fixe": "additionalFields.attributes.supann.supannEmpDateFin"
-        },
-        "additionalFields": {
-            "additionalFields.objectClasses": ["supann"],
-            "additionalFields.attributes.supann.supannTypeEntiteAffectation": "adm",
-            "state": -1,
-        }
-    },
-    "taiga_esn.json": {
-        "mapping": {
-            "nom": "inetOrgPerson.cn",
-            "prenom": ["inetOrgPerson.sn", "inetOrgPerson.givenName", "additionalFields.attributes.supann.supannPrenomsEtatCivil"],
-            "id_coord": ["inetOrgPerson.uid", "additionalFields.attributes.supann.supannEmpId"],
-            "email1": "inetOrgPerson.mail",
-            "tel_mob": "inetOrgPerson.mobile",
-            "adresse": "inetOrgPerson.postalAddress",
-            "mot_de_passe_ldap": "inetOrgPerson.userPassword",
-            "civilite": ["additionalFields.attributes.supann.supanncivilite", "additionalFields.attributes.supann.supannOIDCGenre"],
-            "nom_marital": "additionalFields.attributes.supann.supannNomdeNaissance",
-            "nss_date": "additionalFields.attributes.supann.supannOIDCDatedeNaissance",
-            "nns_pays": "additionalFields.attributes.supann.supannCodeINSEEPaysDeNaissance",
-            "nss_ville": "additionalFields.attributes.supann.supannCodeINSEEVilleDeNaissance",
-            "email2": "additionalFields.attributes.supann.supannAutreMail",
-            #"sesame": "additionalFields.attributes.supann.supannListeRouge",
-            #"outil de messagerie ou sesame ?": "additionalFields.attributes.mailForwardingAddress",
-            #"taiga + sesame": "additionalFields.attributes.supann.supannMailPerso",
-            #"calculé": "additionalFields.attributes.supann.supannRoleGenerique",
-            #"saisie": "additionalFields.attributes.supann.supannParrainDN",
-            #"calcué": "additionalFields.attributes.supann.supannTypeEntiteAffectation",
-            #"": "additionalFields.attributes.supann.supannActivite",
-            #"taiga, sesame ou fixe": "additionalFields.attributes.supann.supannEmpDateFin"
-        },
-        "additionalFields": {
-            "additionalFields.objectClasses": ["supann"],
-            "additionalFields.attributes.supann.supannTypeEntiteAffectation": "esn",
-            "state": -1,
-        }
-    },
-}
 
 async def gather_with_concurrency(n, tasks):
     semaphore = asyncio.Semaphore(n)
@@ -125,7 +36,7 @@ async def get_data(data, config):
         result.append(treated)
     return result
 
-    
+
 
 async def process_data(data, config, file, session):
     print(f"Processing {file}")
@@ -136,15 +47,20 @@ async def process_data(data, config, file, session):
     await gather_with_concurrency(25, tasks)
     print(f"Processed {file}")
 
+async def load_config():
+    with open('./config.yml', 'r', encoding='utf-8') as fichier:
+        return yaml.load(fichier, Loader=yaml.FullLoader)
+
 async def import_ind():
+    configs = await load_config()
     cache_files = os.listdir('./cache')
     datas = {}
     for file in cache_files:
-        with open(f'./cache/{file}', 'r', encoding='utf-8') as fichier:
-            datas[file] = json.load(fichier).get('data')
+        if file in configs.keys():
+          print(f"Loading {file}, keys: {configs.keys()}")
+          with open(f'./cache/{file}', 'r', encoding='utf-8') as fichier:
+              datas[file] = json.load(fichier).get('data')
 
     async with aiohttp.ClientSession() as session:
-        # for file in cache_files:
-        #     await process_data(datas[file], configs[file], file, session)
-        tasks = [process_data(datas[file], configs[file], file, session) for file in cache_files]
+        tasks = [process_data(datas[file], configs[file], file, session) for file in cache_files if file in configs.keys()]
         await gather_with_concurrency(10, tasks)

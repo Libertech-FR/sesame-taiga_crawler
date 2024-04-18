@@ -1,0 +1,80 @@
+{
+    "taiga_etd.json": {
+        "mapping": {
+            "inetOrgPerson.cn": "nom",
+            "inetOrgPerson.sn": "prenom",
+            "inetOrgPerson.givenName": "prenom",
+            "additionalFields.attributes.supann.supannPrenomsEtatCivil": "prenom",
+            "inetOrgPerson.uid": "id_coord",
+            "additionalFields.attributes.supann.supannRefId": "id_coord",
+            "inetOrgPerson.mail": "email1",
+            "inetOrgPerson.mobile": "tel_mob",
+            "inetOrgPerson.postalAddress": "adresse",
+            "inetOrgPerson.userPassword": "mot_de_passe_ldap",
+            "additionalFields.attributes.supann.supanncivilite": "civilite",
+            "additionalFields.attributes.supann.supannOIDCGenre": "civilite",
+            "additionalFields.attributes.supann.supannNomdeNaissance": "nom_marital",
+            "additionalFields.attributes.supann.supannOIDCDatedeNaissance": "nss_date",
+            "additionalFields.attributes.supann.supannCodeINSEEPaysDeNaissance": "nns_pays",
+            "additionalFields.attributes.supann.supannCodeINSEEVilleDeNaissance": "nss_ville",
+            "additionalFields.attributes.supann.supannAutreMail": "email2"
+        },
+        "additionalFields": {
+            "additionalFields.objectClasses": ["supann"],
+            "additionalFields.attributes.supann.supannTypeEntiteAffectation": "etd",
+            "state": -1
+        }
+    },
+    "taiga_adm.json": {
+        "mapping": {
+            "inetOrgPerson.cn": "nom",
+            "inetOrgPerson.sn": "prenom",
+            "inetOrgPerson.givenName": "prenom",
+            "additionalFields.attributes.supann.supannPrenomsEtatCivil": "prenom",
+            "inetOrgPerson.uid": "id_coord",
+            "additionalFields.attributes.supann.supannEmpId": "id_coord",
+            "inetOrgPerson.mail": "email1",
+            "inetOrgPerson.mobile": "tel_mob",
+            "inetOrgPerson.postalAddress": "adresse",
+            "inetOrgPerson.userPassword": "mot_de_passe_ldap",
+            "additionalFields.attributes.supann.supanncivilite": "civilite",
+            "additionalFields.attributes.supann.supannOIDCGenre": "civilite",
+            "additionalFields.attributes.supann.supannNomdeNaissance": "nom_marital",
+            "additionalFields.attributes.supann.supannOIDCDatedeNaissance": "nss_date",
+            "additionalFields.attributes.supann.supannCodeINSEEPaysDeNaissance": "nns_pays",
+            "additionalFields.attributes.supann.supannCodeINSEEVilleDeNaissance": "nss_ville",
+            "additionalFields.attributes.supann.supannAutreMail": "email2"
+        },
+        "additionalFields": {
+            "additionalFields.objectClasses": ["supann"],
+            "additionalFields.attributes.supann.supannTypeEntiteAffectation": "adm",
+            "state": -1
+        }
+    },
+    "taiga_esn.json": {
+        "mapping": {
+            "inetOrgPerson.cn": "nom",
+            "inetOrgPerson.sn": "prenom",
+            "inetOrgPerson.givenName": "prenom",
+            "additionalFields.attributes.supann.supannPrenomsEtatCivil": "prenom",
+            "inetOrgPerson.uid": "id_coord",
+            "additionalFields.attributes.supann.supannEmpId": "id_coord",
+            "inetOrgPerson.mail": "email1",
+            "inetOrgPerson.mobile": "tel_mob",
+            "inetOrgPerson.postalAddress": "adresse",
+            "inetOrgPerson.userPassword": "mot_de_passe_ldap",
+            "additionalFields.attributes.supann.supanncivilite": "civilite",
+            "additionalFields.attributes.supann.supannOIDCGenre": "civilite",
+            "additionalFields.attributes.supann.supannNomdeNaissance": "nom_marital",
+            "additionalFields.attributes.supann.supannOIDCDatedeNaissance": "nss_date",
+            "additionalFields.attributes.supann.supannCodeINSEEPaysDeNaissance": "nns_pays",
+            "additionalFields.attributes.supann.supannCodeINSEEVilleDeNaissance": "nss_ville",
+            "additionalFields.attributes.supann.supannAutreMail": "email2"
+        },
+        "additionalFields": {
+            "additionalFields.objectClasses": ["supann"],
+            "additionalFields.attributes.supann.supannTypeEntiteAffectation": "esn",
+            "state": -1
+        }
+    }
+}
