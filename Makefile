@@ -1,12 +1,30 @@
 include .env
 STC_API_HOST?=taiga.archi.fr
 STC_API_FORWARD_PORT?=1337
+IMG_NAME = "ghcr.io/libertech-fr/sesame-taiga_crawler"
+BASE_NAME = "sesame"
+APP_NAME = "sesame-taiga_crawler"
+PLATFORM = "linux/amd64"
 
 .DEFAULT_GOAL := help
 help:
 	@printf "\033[33mUsage:\033[0m\n  make [target] [arg=\"val\"...]\n\n\033[33mTargets:\033[0m\n"
 	@grep -E '^[-a-zA-Z0-9_\.\/]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) \
 		| sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[32m%-15s\033[0m %s\n", $$1, $$2}'
+
+build: ## Construit l'image docker
+	@printf "\033[33mDOCKER:\033[0m Build docker image ...\n"
+	@docker build -t sesame-taiga_crawler .
+	@printf "\033[33mDOCKER:\033[0m SUCCESSFUL !!!\n"
+
+run-crawler-docker: ## Lance le crawler Sesame - Taiga avec python !
+	@docker run --rm -it \
+		--add-host host.docker.internal:host-gateway \
+		--network dev \
+		--platform $(PLATFORM) \
+		--name $(APP_NAME) \
+		-v $(CURDIR):/data \
+		sesame-taiga_crawler
 
 run-crawler: ## Lance le crawler Sesame - Taiga avec python !
 	@python3 main.py

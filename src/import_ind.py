@@ -8,6 +8,7 @@ import yaml
 
 dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
+sesame_api_token = os.getenv('SESAME_API_TOKEN')
 
 async def gather_with_concurrency(n, tasks):
     semaphore = asyncio.Semaphore(n)
@@ -20,8 +21,13 @@ async def gather_with_concurrency(n, tasks):
     return await asyncio.gather(*[sem_task(task) for task in tasks])
 
 async def send_request(session, url, json):
+    headers = {
+        "Authorization": f"Bearer {sesame_api_token}",
+        "Content-Type": "application/json; charset=utf-8",
+    }
+
     try:
-        async with session.post(url, json=json) as response:
+        async with session.post(url, json=json, headers=headers) as response:
             response.raise_for_status()  # Raises error for 4xx/5xx responses
             print(f"Request to {url} successful: {response.status}")
     except aiohttp.ClientError as e:
