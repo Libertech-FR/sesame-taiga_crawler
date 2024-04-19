@@ -9,6 +9,8 @@ import yaml
 dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
 sesame_api_token = os.getenv('SESAME_API_TOKEN')
+sesame_import_parallels_files = int(os.getenv('SESAME_IMPORT_PARALLELS_FILES', 1))
+sesame_import_parallels_entries = int(os.getenv('SESAME_IMPORT_PARALLELS_ENTRIES', 5))
 
 async def gather_with_concurrency(n, tasks):
     semaphore = asyncio.Semaphore(n)
@@ -50,7 +52,7 @@ async def process_data(data, config, file, session):
     with open(f'./data/{file}', 'w', encoding='utf-8') as fichier:
         json.dump(result, fichier, ensure_ascii=False)
     tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert', entry) for entry in result]
-    await gather_with_concurrency(25, tasks)
+    await gather_with_concurrency(sesame_import_parallels_files, tasks)
     print(f"Processed {file}")
 
 async def load_config():
@@ -69,4 +71,4 @@ async def import_ind():
 
     async with aiohttp.ClientSession() as session:
         tasks = [process_data(datas[file], configs[file], file, session) for file in cache_files if file in configs.keys()]
-        await gather_with_concurrency(10, tasks)
+        await gather_with_concurrency(sesame_import_parallels_files, tasks)
