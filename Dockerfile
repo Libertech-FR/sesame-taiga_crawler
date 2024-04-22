@@ -6,6 +6,8 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /data
 
+RUN mkdir data cache
+
 ARG UID=10001
 RUN adduser \
   --disabled-password \
@@ -15,6 +17,8 @@ RUN adduser \
   --no-create-home \
   --uid "${UID}" \
   appuser
+
+RUN chown -R appuser:appuser data cache
 
 RUN --mount=type=cache,target=/root/.cache/pip \
   --mount=type=bind,source=requirements.txt,target=requirements.txt \
