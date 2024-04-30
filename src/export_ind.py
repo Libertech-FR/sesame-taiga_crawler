@@ -36,6 +36,7 @@ async def export_ind(url, col, headers):
                 },
                 fichier,
                 ensure_ascii=False,
+                indent=4,
             )
         logger.info(f"{col.get('method')}")
     except requests.exceptions.HTTPError as e:

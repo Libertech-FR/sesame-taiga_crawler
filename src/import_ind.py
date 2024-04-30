@@ -60,7 +60,7 @@ async def process_data(data, config, file, session):
     print(f"Processing {file}")
     result = await get_data(data, config)
     with open(f'./data/{file}', 'w', encoding='utf-8') as fichier:
-        json.dump(result, fichier, ensure_ascii=False)
+        json.dump(result, fichier, ensure_ascii=False, indent=4)
     tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert', entry) for entry in result]
     await gather_with_concurrency(sesame_import_parallels_files, tasks)
     print(f"Processed {file}")
