@@ -1,4 +1,5 @@
 include .env
+STC_API_TARGET?=193.52.197.92
 STC_API_HOST?=taiga.archi.fr
 STC_API_FORWARD_PORT?=1337
 IMG_NAME = "ghcr.io/libertech-fr/sesame-taiga_crawler"
@@ -36,8 +37,8 @@ install-deps: ## Installe les dépendances python
 
 taiga-forward: ## Transfert les appels de l'API Taiga via un proxy socks au travers du serveur sesame (à utiliser pour lancer le script à distance)
 	@printf "\033[33mNCAT:\033[0m Launch forwarding tcp requests for <$(STC_API_HOST)> ...\n"
-	@ssh libertech@193.52.197.92 "pkill -f 'ncat $(STC_API_HOST) 443'" || true
-	@ssh libertech@193.52.197.92 "ncat --keep-open --no-shutdown -v \
+	@ssh libertech@$(STC_API_TARGET) "pkill -f 'ncat $(STC_API_HOST) 443'" || true
+	@ssh libertech@$(STC_API_TARGET) "ncat --keep-open --no-shutdown -v \
 		--sh-exec 'ncat $(STC_API_HOST) 443' \
 		-l $(STC_API_FORWARD_PORT)"
 	@printf "\033[33mNCAT:\033[0m End of forwarding requests !\n"
