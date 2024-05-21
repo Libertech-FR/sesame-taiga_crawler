@@ -32,10 +32,14 @@ async def send_request(session, url, json):
         "Authorization": f"Bearer {sesame_api_token}",
         "Content-Type": "application/json; charset=utf-8",
     }
+    params = {
+        "filters[inetOrgPerson.employeeNumber]": f"{json.get('inetOrgPerson', {}).get('employeeNumber')}",
+        "filters[inetOrgPerson.employeeType]": "TAIGA",
+    }
 
     try:
 
-        async with session.post(url, json=json, headers=headers) as response:
+        async with session.post(url, json=json, headers=headers, params=params) as response:
             print(f"Request to {url} successful: {response.status}")
             await read_response(response)
             response.raise_for_status()  # Raises error for 4xx/5xx responses
