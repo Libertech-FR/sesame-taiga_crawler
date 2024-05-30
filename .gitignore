@@ -1,5 +1,9 @@
 cache/
+cache_old/
 logs/
 .env
 src/__pycache__/*
 .idea/
+lib/
+bin/
+pyvenv.cfg

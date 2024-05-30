@@ -41,7 +41,11 @@ async def send_request(session, url, json):
 
         async with session.post(url, json=json, headers=headers, params=params) as response:
             print(f"Request to {url} successful: {response.status}")
-            await read_response(response)
+            if response.status == 304:
+                print(f"Cached entry {json.get('inetOrgPerson', {}).get('employeeNumber')}")
+            else:
+                print(f"Response to {json.get('inetOrgPerson', {}).get('employeeNumber')}:")
+                await read_response(response)
             response.raise_for_status()  # Raises error for 4xx/5xx responses
     except aiohttp.ClientResponseError as e:
         # This catches responses like 400, 404, 500 etc.

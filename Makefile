@@ -18,6 +18,9 @@ build: ## Construit l'image docker
 	@docker build -t sesame-taiga_crawler .
 	@printf "\033[33mDOCKER:\033[0m SUCCESSFUL !!!\n"
 
+pull-crawler-docker: ## Pull l'image docker
+	@docker pull $(IMG_NAME)
+
 run-crawler-docker: ## Lance le crawler Sesame - Taiga avec python !
 	@docker run --rm -it \
 		--add-host host.docker.internal:host-gateway \
