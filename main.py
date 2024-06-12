@@ -4,6 +4,7 @@ import logging
 import os
 from dotenv import load_dotenv
 import hashlib
+import sys
 from datetime import datetime
 
 from src.a_moins_b import a_moins_b
@@ -65,23 +66,27 @@ collections = [
 ]
 
 
-async def main():
-    logger.info("Starting Taiga crawler...")
-    await a_moins_b(url, 0, -1, headers)
-    collection_tasks = [col.get('function')(url, col, headers) for col in collections]
-    await asyncio.gather(*collection_tasks)
-    print("Taiga crawler ended successful !!!")
-
-    print("Starting import_ind...")
-    start_time = datetime.now()
-    await import_ind()
-    end_time = datetime.now()
-    execution_time = end_time - start_time
-    print(f"import_ind completed in {execution_time}")
+async def main(args):
+    run = ""
+    if len(args) == 2:
+       run = args[1]
+    if run == 'taiga' or run == '':
+        logger.info("Starting Taiga crawler...")
+        await a_moins_b(url, 0, -1, headers)
+        collection_tasks = [col.get('function')(url, col, headers) for col in collections]
+        await asyncio.gather(*collection_tasks)
+        print("Taiga crawler ended successful !!!")
+    if run == 'sesame' or run == '':
+        print("Starting import_ind...")
+        start_time = datetime.now()
+        await import_ind()
+        end_time = datetime.now()
+        execution_time = end_time - start_time
+        print(f"import_ind completed in {execution_time}")
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     try:
-        loop.run_until_complete(main())
+        loop.run_until_complete(main(sys.argv))
     finally:
         loop.close()
