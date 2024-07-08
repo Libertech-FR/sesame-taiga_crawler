@@ -73,6 +73,7 @@ async def main():
     parser.add_argument('--an', help='Année universitaire à importer ',default="0")
     args = parser.parse_args()
     if args.an != 0 :
+        print(f"Import pour l'annee {args.an}")
         for col in collections:
             col.get('params')['au']=int(args.an)
 
