@@ -5,6 +5,7 @@ IMG_NAME = "ghcr.io/libertech-fr/sesame-taiga_crawler"
 BASE_NAME = "sesame"
 APP_NAME = "sesame-taiga_crawler"
 PLATFORM = "linux/amd64"
+STC_RUN = ""
 include .env
 
 .DEFAULT_GOAL := help
@@ -28,7 +29,7 @@ run-crawler-docker: ## Lance le crawler Sesame - Taiga avec python !
 		--platform $(PLATFORM) \
 		--name $(APP_NAME) \
 		-v $(CURDIR):/data \
-		$(IMG_NAME)
+		$(IMG_NAME) python main.py $(STC_RUN)
 
 run-crawler: ## Lance le crawler Sesame - Taiga avec python !
 	@python3 main.py
