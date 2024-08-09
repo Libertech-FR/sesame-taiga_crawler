@@ -37,37 +37,37 @@ ensa_infos = {
     "pass_ensa": hashlib.sha1(ensa_pass.encode()).hexdigest(),
 }
 
-print(ensa_infos)
-print(headers)
+# print(ensa_infos)
+# print(headers)
 
 collections = [
-    # {
-    #     "function": export_ind,
-    #     "method": "ExportInd",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "etd",
-    #         "id": "*",
-    #     },
-    # },
-    # {
-    #     "function": export_ind,
-    #     "method": "ExportInd",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "adm",
-    #         "id": "*",
-    #     },
-    # },
-    # {
-    #     "function": export_ind,
-    #     "method": "ExportInd",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "esn",
-    #         "id": "*",
-    #     },
-    # },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "etd",
+            "id": "*",
+        },
+    },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "adm",
+            "id": "*",
+        },
+    },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "esn",
+            "id": "*",
+        },
+    },
     {
         "function": export_pictures,
         "method": "ExportPhotos",
@@ -98,7 +98,7 @@ async def main(args):
     if run == 'sesame' or run == '':
         print("Starting import_ind...")
         start_time = datetime.now()
-        # await import_ind()
+        await import_ind()
         await import_pictures()
         end_time = datetime.now()
         execution_time = end_time - start_time
