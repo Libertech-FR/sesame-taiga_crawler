@@ -98,7 +98,8 @@ async def main():
             col.get('params')['au']=int(args.an)
 
     if args.run == 'taiga' or args.run == 'all':
-        logger.info("Starting Taiga crawler...")
+        logger.info("Starting Taiga ind/pictures crawler...")
+        print(f"Imports: {args.imports}")
         await a_moins_b(url, 0, -1, headers)
         collection_tasks = [col.get('function')(url, col, headers) for col in collections]
 
@@ -110,7 +111,8 @@ async def main():
         await asyncio.gather(*collection_tasks)
         print("Taiga crawler ended successful !!!")
     if args.run == 'sesame' or args.run == 'all':
-        print("Starting import_ind...")
+        print("Starting import_ind/pictures...")
+        print(f"Imports: {args.imports}")
         start_time = datetime.now()
         if (args.imports == 'ind' or args.imports == 'all'):
             await import_ind()
