@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import hashlib
 import sys
 from datetime import datetime
+import argparse
 
 from src.a_moins_b import a_moins_b
 from src.export_pictures import export_pictures
@@ -85,17 +86,23 @@ collections = [
 ]
 
 
-async def main(args):
-    run = ""
-    if len(args) == 2:
-       run = args[1]
-    if run == 'taiga' or run == '':
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--run', help='all | taiga | sesame',default='all')
+    parser.add_argument('--an', help='Année universitaire à importer ',default="0")
+    args = parser.parse_args()
+    if args.an != 0 :
+        print(f"Import pour l'annee {args.an}")
+        for col in collections:
+            col.get('params')['au']=int(args.an)
+
+    if args.run == 'taiga' or args.run == 'all':
         logger.info("Starting Taiga crawler...")
         await a_moins_b(url, 0, -1, headers)
         collection_tasks = [col.get('function')(url, col, headers) for col in collections]
         await asyncio.gather(*collection_tasks)
         print("Taiga crawler ended successful !!!")
-    if run == 'sesame' or run == '':
+    if args.run == 'sesame' or args.run == 'all':
         print("Starting import_ind...")
         start_time = datetime.now()
         await import_ind()
@@ -107,6 +114,6 @@ async def main(args):
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     try:
-        loop.run_until_complete(main(sys.argv))
+        loop.run_until_complete(main())
     finally:
         loop.close()

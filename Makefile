@@ -29,7 +29,7 @@ run-crawler-docker: ## Lance le crawler Sesame - Taiga avec python !
 		--platform $(PLATFORM) \
 		--name $(APP_NAME) \
 		-v $(CURDIR):/data \
-		$(IMG_NAME) python main.py $(STC_RUN)
+		$(IMG_NAME) python main.py --run=$(STC_RUN)
 
 run-crawler: ## Lance le crawler Sesame - Taiga avec python !
 	@python3 main.py
