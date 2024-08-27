@@ -107,13 +107,13 @@ async def import_pictures():
             with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
                 datasCurrent[file.split('.')[0]] = json.load(fichier).get('data')
 
-    print(files)
-
     for file in files:
         if datasOld.get(file.split('.')[0]) is not None:
             datas[file.split('.')[0]] = filter_datas(datasCurrent[file.split('.')[0]], datasOld[file.split('.')[0]])
         else:
             datas[file.split('.')[0]] = datasCurrent[file.split('.')[0]]
+
+    print(datas)
 
     async with aiohttp.ClientSession() as session:
         tasks = [process_data(datas[entry], entry, session) for entry in datas]
