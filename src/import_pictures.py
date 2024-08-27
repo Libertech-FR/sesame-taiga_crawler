@@ -113,6 +113,8 @@ async def import_pictures():
         else:
             datas[file.split('.')[0]] = datasCurrent[file.split('.')[0]]
 
+    print(datasOld)
+    print(datasCurrent)
     print(datas)
 
     async with aiohttp.ClientSession() as session:
