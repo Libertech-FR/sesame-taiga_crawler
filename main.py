@@ -42,33 +42,33 @@ ensa_infos = {
 # print(headers)
 
 collections = [
-    # {
-    #     "function": export_ind,
-    #     "method": "ExportInd",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "etd",
-    #         "id": "*",
-    #     },
-    # },
-    # {
-    #     "function": export_ind,
-    #     "method": "ExportInd",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "adm",
-    #         "id": "*",
-    #     },
-    # },
-    # {
-    #     "function": export_ind,
-    #     "method": "ExportInd",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "esn",
-    #         "id": "*",
-    #     },
-    # },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "etd",
+            "id": "*",
+        },
+    },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "adm",
+            "id": "*",
+        },
+    },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "esn",
+            "id": "*",
+        },
+    },
     {
         "function": export_pictures,
         "method": "ExportPhotos",
