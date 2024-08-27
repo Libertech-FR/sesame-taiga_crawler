@@ -23,15 +23,18 @@ def copy_file(source, destination):
         dest_file.write(data)
 
 async def export_pictures(url, col, headers):
+    params = {k: v for k, v in col.get("params", {}).items() if k != "au"}
     payload = {
         "jsonrpc": "2.0",
         "method": col.get('method'),
-        "params": col.get("params"),
+        "params": params,
         "id": str(uuid.uuid4()),
     }
     try:
         response = requests.post(url, json=payload, headers=headers, verify=False, timeout=10000)
         response.raise_for_status()
+        print(payload)
+        print(response.json())
         if response.text == 'ko!':
             raise Exception("ko!")
         elif not response.json()['result']['output']:
