@@ -89,6 +89,7 @@ collections = [
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', help='all | taiga | sesame',default='all')
+    parser.add_argument('--imports', help='all | ind | pictures',default='all')
     parser.add_argument('--an', help='Année universitaire à importer ',default="0")
     args = parser.parse_args()
     if args.an != 0:
@@ -100,13 +101,21 @@ async def main():
         logger.info("Starting Taiga crawler...")
         await a_moins_b(url, 0, -1, headers)
         collection_tasks = [col.get('function')(url, col, headers) for col in collections]
+
+        if args.imports == 'ind' or args.imports == 'all':
+            collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') != 'ExportPhotos']
+        elif args.imports == 'pictures' or args.imports == 'all':
+            collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') == 'ExportPhotos']
+
         await asyncio.gather(*collection_tasks)
         print("Taiga crawler ended successful !!!")
     if args.run == 'sesame' or args.run == 'all':
         print("Starting import_ind...")
         start_time = datetime.now()
-        await import_ind()
-        await import_pictures()
+        if (args.imports == 'ind' or args.imports == 'all'):
+            await import_ind()
+        elif (args.imports == 'pictures' or args.imports == 'all'):
+            await import_pictures()
         end_time = datetime.now()
         execution_time = end_time - start_time
         print(f"import_ind completed in {execution_time}")
