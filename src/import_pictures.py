@@ -33,7 +33,7 @@ async def send_request(session, url, json):
         "Authorization": f"Bearer {sesame_api_token}",
     }
     params = {
-        "filters[inetOrgPerson.employeeNumber]": f"{json.get('id')}",
+        "filters[inetOrgPerson.jpegPhoto]": f"{json.get('id')}.jpg",
         "filters[inetOrgPerson.employeeType]": "TAIGA",
     }
 
@@ -68,7 +68,7 @@ async def process_data(data, file, session):
             print(f"Reading picture {entry['ident']}.jpg")
             picture = fichier.read()
             files.append({
-                "id": entry["ident"].split('-')[1],
+                "id": entry["ident"],
                 "file": picture,
             })
 
