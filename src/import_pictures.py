@@ -33,7 +33,7 @@ async def send_request(session, url, json):
         "Authorization": f"Bearer {sesame_api_token}",
     }
     params = {
-        "filters[inetOrgPerson.jpegPhoto]": f"{json.get('id')}.jpg",
+        "filters[inetOrgPerson.photo]": f"{json.get('id')}.jpg",
         "filters[inetOrgPerson.employeeType]": "TAIGA",
     }
 
