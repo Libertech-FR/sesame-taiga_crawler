@@ -61,10 +61,11 @@ async def send_request(session, url, json):
 
 async def process_data(data, file, session):
     files = []
-    print(f"Processing {file}")
+    print(f"Processing pictures {file}")
 
     for entry in data:
         with open(f'./cache/pictures/files/{entry["ident"]}.jpg', 'rb') as fichier:
+            print(f"Reading picture {entry['ident']}.jpg")
             picture = fichier.read()
             files.append({
                 "id": entry["ident"].split('-')[1],
@@ -73,7 +74,7 @@ async def process_data(data, file, session):
 
     tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert/photo', part) for part in files]
     await gather_with_concurrency(sesame_import_parallels_files, tasks)
-    print(f"Processed {file}")
+    print(f"Processed pictures {file}")
 
 def list_files_in_dir(directory):
     files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
