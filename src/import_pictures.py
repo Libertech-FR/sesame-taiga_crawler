@@ -37,7 +37,7 @@ async def send_request(session, url, json):
         "filters[inetOrgPerson.employeeType]": "TAIGA",
     }
 
-    print('filters', params)
+    # print('filters', params)
 
     try:
         form = aiohttp.FormData()
