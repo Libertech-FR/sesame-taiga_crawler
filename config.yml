@@ -1,25 +1,26 @@
 ---
-taiga_etd.json: 
-  mapping: 
-    inetOrgPerson.cn: 
+taiga_etd.json:
+  mapping:
+    inetOrgPerson.cn:
     - "nom"
     - "prenom"
-    inetOrgPerson.displayName: 
+    inetOrgPerson.displayName:
     - "prenom"
     - "nom"
     inetOrgPerson.sn: "nom"
     inetOrgPerson.givenName: "prenom"
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
     inetOrgPerson.employeeNumber: "id_coord"
-    $setOnInsert.inetOrgPerson.uid: 
+    customFields.photo: "photo_nom"
+    $setOnInsert.inetOrgPerson.uid:
     - "prenom"
     - "nom"
     additionalFields.attributes.supannPerson.supannRefId: "id_coord"
-    $setOnInsert.inetOrgPerson.mail: 
+    $setOnInsert.inetOrgPerson.mail:
     - "prenom"
     - "nom"
     inetOrgPerson.mobile: "tel_mob"
-    inetOrgPerson.postalAddress: 
+    inetOrgPerson.postalAddress:
     - "adresse"
     - "CP"
     - "Ville"
@@ -28,51 +29,54 @@ taiga_etd.json:
     additionalFields.attributes.supannPerson.supannNomdeNaissance: "nom_marital"
     additionalFields.attributes.supannPerson.supannOIDCDatedeNaissance: "nss_date"
     additionalFields.attributes.supannPerson.supannAutreMail: "email2"
-  additionalFields: 
-    additionalFields.objectClasses: 
+  additionalFields:
+    additionalFields.objectClasses:
     - "supannPerson"
-    additionalFields.attributes.supannPerson.supannTypeEntiteAffectation: "etd"
+    additionalFields.attributes.supannPerson.supannTypeEntiteAffectation:
+    - "etd"
+    additionalFields.attributes.supannPerson.supannEntiteAffectationPrincipale: "etd"
     state: -1
     inetOrgPerson.employeeType: "TAIGA"
-    inetOrgPerson.departmentNumber: "etd"
+    inetOrgPerson.departmentNumber:
+    - "etd"
     additionalFields.attributes.supannPerson.supannEtablissement: "{UAI}A123456"
-  transforms: 
+  transforms:
     inetOrgPerson.cn: "join(delimiter=' ')"
     inetOrgPerson.displayName: "join(delimiter=' ')"
     inetOrgPerson.postalAddress: "join(delimiter=',')"
-    $setOnInsert.inetOrgPerson.uid: 
+    $setOnInsert.inetOrgPerson.uid:
     - "join(delimiter='.')"
     - "remove_accents"
     - "lower"
-    - "replace(old=' ',new='-')"
-#    - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
-    $setOnInsert.inetOrgPerson.mail: 
+    - replace(old=' ',new='-')
+    - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
+    $setOnInsert.inetOrgPerson.mail:
     - "join(delimiter='.')"
     - "lower"
-    - "remove_accents" 
+    - "remove_accents"
     - "replace(old=' ',new='-')"
     - "suffix(string='@lyon.archi.fr')"
-taiga_adm.json: 
-  mapping: 
-    inetOrgPerson.cn: 
+taiga_adm.json:
+  mapping:
+    inetOrgPerson.cn:
     - "nom"
     - "prenom"
-    inetOrgPerson.displayName: 
+    inetOrgPerson.displayName:
     - "prenom"
     - "nom"
     inetOrgPerson.sn: "nom"
     inetOrgPerson.givenName: "prenom"
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
     inetOrgPerson.employeeNumber: "id_coord"
-    $setOnInsert.inetOrgPerson.uid: 
+    $setOnInsert.inetOrgPerson.uid:
     - "prenom"
     - "nom"
     additionalFields.attributes.supannPerson.supannEmpId: "id_coord"
-    $setOnInsert.inetOrgPerson.mail: 
+    $setOnInsert.inetOrgPerson.mail:
     - "prenom"
     - "nom"
     inetOrgPerson.mobile: "tel_mob"
-    inetOrgPerson.postalAddress: 
+    inetOrgPerson.postalAddress:
     - "adresse"
     - "CP"
     - "Ville"
@@ -81,51 +85,54 @@ taiga_adm.json:
     additionalFields.attributes.supannPerson.supannNomdeNaissance: "nom_marital"
     additionalFields.attributes.supannPerson.supannOIDCDatedeNaissance: "nss_date"
     additionalFields.attributes.supannPerson.supannAutreMail: "email2"
-  additionalFields: 
-    additionalFields.objectClasses: 
+  additionalFields:
+    additionalFields.objectClasses:
     - "supannPerson"
-    additionalFields.attributes.supannPerson.supannTypeEntiteAffectation: "adm"
+    additionalFields.attributes.supannPerson.supannTypeEntiteAffectation:
+    - "adm"
+    additionalFields.attributes.supannPerson.supannEntiteAffectationPrincipale: "adm"
     additionalFields.attributes.supannPerson.supannEtablissement: "{UAI}A123456"
     inetOrgPerson.employeeType: "TAIGA"
-    inetOrgPerson.departmentNumber: "adm"
+    inetOrgPerson.departmentNumber:
+    - "adm"
     state: -1
-  transforms: 
+  transforms:
     inetOrgPerson.cn: "join(delimiter=' ')"
     inetOrgPerson.displayName: "join(delimiter=' ')"
     inetOrgPerson.postalAddress: "join(delimiter=',')"
-    $setOnInsert.inetOrgPerson.uid: 
+    $setOnInsert.inetOrgPerson.uid:
     - "join(delimiter='.')"
     - "remove_accents"
     - "lower"
     - "replace(old=' ',new='-')"
-#    - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
-    $setOnInsert.inetOrgPerson.mail: 
+    - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
+    $setOnInsert.inetOrgPerson.mail:
     - "join(delimiter='.')"
     - "remove_accents"
     - "lower"
     - "replace(old=' ',new='-')"
     - "suffix(string='@lyon.archi.fr')"
-taiga_esn.json: 
-  mapping: 
-    inetOrgPerson.cn: 
+taiga_esn.json:
+  mapping:
+    inetOrgPerson.cn:
     - "nom"
     - "prenom"
-    inetOrgPerson.displayName: 
+    inetOrgPerson.displayName:
     - "prenom"
     - "nom"
     inetOrgPerson.sn: "nom"
     inetOrgPerson.givenName: "prenom"
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
     inetOrgPerson.employeeNumber: "id_coord"
-    $setOnInsert.inetOrgPerson.uid: 
+    $setOnInsert.inetOrgPerson.uid:
     - "prenom"
     - "nom"
     additionalFields.attributes.supannPerson.supannEmpId: "id_coord"
-    $setOnInsert.inetOrgPerson.mail: 
+    $setOnInsert.inetOrgPerson.mail:
     - "prenom"
     - "nom"
     inetOrgPerson.mobile: "tel_mob"
-    inetOrgPerson.postalAddress: 
+    inetOrgPerson.postalAddress:
     - "adresse"
     - "CP"
     - "Ville"
@@ -134,24 +141,28 @@ taiga_esn.json:
     additionalFields.attributes.supannPerson.supannNomdeNaissance: "nom_marital"
     additionalFields.attributes.supannPerson.supannOIDCDatedeNaissance: "nss_date"
     additionalFields.attributes.supannPerson.supannAutreMail: "email2"
-  additionalFields: 
-    additionalFields.objectClasses: 
+  additionalFields:
+    additionalFields.objectClasses:
     - "supannPerson"
-    additionalFields.attributes.supannPerson.supannTypeEntiteAffectation: "esn"
+    additionalFields.attributes.supannPerson.supannTypeEntiteAffectation:
+    - "esn"
+    additionalFields.attributes.supannPerson.supannEntiteAffectationPrincipale: "esn"
     additionalFields.attributes.supannPerson.supannEtablissement: "{UAI}A123456"
-    inetOrgPerson.departmentNumber: "esn"
+    inetOrgPerson.departmentNumber:
+    - "esn"
     inetOrgPerson.employeeType: "TAIGA"
     state: -1
-  transforms: 
+  transforms:
     inetOrgPerson.cn: "join(delimiter=' ')"
     inetOrgPerson.displayName: "join(delimiter=' ')"
     inetOrgPerson.postalAddress: "join(delimiter=',')"
-    $setOnInsert.inetOrgPerson.uid: 
+    $setOnInsert.inetOrgPerson.uid:
     - "join(delimiter='.')"
     - "remove_accents"
     - "lower"
-#    - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
-    $setOnInsert.inetOrgPerson.mail: 
+    - "replace(old=' ',new='-')"
+    - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
+    $setOnInsert.inetOrgPerson.mail:
     - "join(delimiter='.')"
     - "remove_accents"
     - "lower"
