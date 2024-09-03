@@ -105,7 +105,7 @@ async def main():
 
         if args.imports == 'ind' or args.imports == 'all':
             collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') != 'ExportPhotos']
-        elif args.imports == 'pictures' or args.imports == 'all':
+        if args.imports == 'pictures' or args.imports == 'all':
             collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') == 'ExportPhotos']
 
         await asyncio.gather(*collection_tasks)
@@ -116,7 +116,7 @@ async def main():
         start_time = datetime.now()
         if (args.imports == 'ind' or args.imports == 'all'):
             await import_ind()
-        elif (args.imports == 'pictures' or args.imports == 'all'):
+        if (args.imports == 'pictures' or args.imports == 'all'):
             await import_pictures()
         end_time = datetime.now()
         execution_time = end_time - start_time
