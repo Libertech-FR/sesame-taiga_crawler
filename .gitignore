@@ -4,6 +4,5 @@ logs/
 .env
 src/__pycache__/*
 .idea/
-lib/
 bin/
 pyvenv.cfg

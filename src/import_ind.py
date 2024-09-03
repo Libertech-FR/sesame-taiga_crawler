@@ -1,7 +1,7 @@
 import asyncio
 import json
 import os
-from data_weaver import weave_entries, weave_entry
+from lib.data_weaver3 import weave_entry
 import aiohttp
 import dotenv
 import yaml
