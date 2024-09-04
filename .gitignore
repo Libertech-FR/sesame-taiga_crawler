@@ -6,3 +6,4 @@ src/__pycache__/*
 .idea/
 bin/
 pyvenv.cfg
+config.yml

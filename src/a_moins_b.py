@@ -24,7 +24,7 @@ async def a_moins_b(url, a, b, headers):
         response.raise_for_status()
         if response.json()['result'] != 1:
             raise Exception("Bad AmoinsB result", response.json())
-        logger.info(f"AmoinsB verification <{payload['id']}> successful !")
+        logger.info(f"API Taiga verification <{payload['id']}> successful !")
     except requests.exceptions.HTTPError as e:
-        logger.warning(f"Failed to test AmoinsB: {e} \n {e.response.text}")
+        logger.warning(f"Failed to test API Taiga: {e} \n {e.response.text}")
         exit(255)

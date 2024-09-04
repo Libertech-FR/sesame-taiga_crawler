@@ -10,7 +10,7 @@ import os
 
 config = {}
 
-def handle_value(data, source_key, target_key, default=True):
+def handle_value(data, source_key, target_key, default=False):
     """
     Handles the value of the given key in the data dictionary.
 

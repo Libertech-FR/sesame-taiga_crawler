@@ -50,16 +50,13 @@ def suffix(value: str | list | dict, suffix: str) -> str:
 def split(value: str, delimiter: str = ' ') -> list:
     return value.split(delimiter)
 
-def joinStr(values: list, delimiter: str = ' ') -> str:
-    print('test jointure xxxxxxxxxxxxxxxxxxxxxxxxx ')
+def join(values: list, delimiter: str = ' ') -> str:
     r=[]
     for v in values:
-        if type(v) is None:
+        if v is None:
             r.append(r)
-        else:
+        elif v != '':
             r.append(v)
-
-    values = [str(value) if value is not None else '' for value in values]
     return delimiter.join(r)
 
 def lower(value: str | list | dict) -> str:
@@ -103,7 +100,7 @@ TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
     "prefix": lambda value, string: prefix(value, string),
     "suffix": lambda value, string: suffix(value, string),
     "split": lambda value, delimiter=None: split(value, delimiter),
-    "join": lambda value, delimiter='': joinStr(value, delimiter),
+    "join": lambda value, delimiter='': join(value, delimiter),
     "replace": lambda value, old, new: replace(value, old, new),
     "regex": lambda value, pattern, replace: regex(value, pattern, replace),
 }
