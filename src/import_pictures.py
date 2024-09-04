@@ -1,10 +1,8 @@
 import asyncio
 import json
 import os
-from data_weaver import weave_entries, weave_entry
 import aiohttp
 import dotenv
-import yaml
 
 dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')

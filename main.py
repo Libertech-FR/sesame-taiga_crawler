@@ -124,6 +124,8 @@ async def main():
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
+    # A Activer pour debugging
+    #loop.set_debug(True)
     try:
         loop.run_until_complete(main())
     finally:

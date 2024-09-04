@@ -1,7 +1,7 @@
 import asyncio
 import json
 import os
-from data_weaver import weave_entries, weave_entry
+from lib.data_weaver3 import weave_entry
 import aiohttp
 import dotenv
 import yaml
@@ -10,7 +10,7 @@ dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
 sesame_api_token = os.getenv('SESAME_API_TOKEN')
 sesame_import_parallels_files = int(os.getenv('SESAME_IMPORT_PARALLELS_FILES', 1))
-sesame_import_parallels_entries = int(os.getenv('SESAME_IMPORT_PARALLELS_ENTRIES', 5))
+sesame_import_parallels_entries = int(os.getenv('SESAME_IMPORT_PARALLELS_ENTRIES', 1))
 
 async def gather_with_concurrency(n, tasks):
     semaphore = asyncio.Semaphore(n)
@@ -40,11 +40,17 @@ async def send_request(session, url, json):
     try:
 
         async with session.post(url, json=json, headers=headers, params=params) as response:
-            print(f"Request to {url} successful: {response.status}")
+            #print(f"Request to {url} successful: {response.status}")
             if response.status == 304:
-                print(f"Cached entry {json.get('inetOrgPerson', {}).get('employeeNumber')}")
+                print(f"{response.status} UNMODIFIED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+            elif response.status == 200:
+                print(f"{response.status} MODIFIED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+            elif response.status == 201:
+                print(f"{response.status} ADDED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+            elif response.status == 202:
+                print(f"{response.status} ADDED WiTH WARNiNG {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
             else:
-                print(f"Response to {json.get('inetOrgPerson', {}).get('employeeNumber')}:")
+                print(f"{response.status} -- {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
                 await read_response(response)
             response.raise_for_status()  # Raises error for 4xx/5xx responses
     except aiohttp.ClientResponseError as e:
