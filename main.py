@@ -106,7 +106,7 @@ async def main():
         if args.imports == 'ind' or args.imports == 'all':
             collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') != 'ExportPhotos']
         if args.imports == 'pictures' or args.imports == 'all':
-            collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') == 'ExportPhotos']
+           collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') == 'ExportPhotos']
 
         await asyncio.gather(*collection_tasks)
         print("Taiga crawler ended successful !!!")
