@@ -1,7 +1,7 @@
 import asyncio
 import base64
 import logging
-import os
+import os, glob
 from dotenv import load_dotenv
 import hashlib
 import sys
@@ -101,12 +101,17 @@ async def main():
         logger.info("Starting Taiga ind/pictures crawler...")
         print(f"Imports: {args.imports}")
         await a_moins_b(url, 0, -1, headers)
-        collection_tasks = [col.get('function')(url, col, headers) for col in collections]
+        # suppression des fichiers cache
+        listjson=glob.glob('./cache/*.json')
+        for file in listjson:
+            os.remove(file)
 
-        if args.imports == 'ind' or args.imports == 'all':
-            collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') != 'ExportPhotos']
-        if args.imports == 'pictures' or args.imports == 'all':
-            collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') == 'ExportPhotos']
+        if args.imports == 'ind':
+           collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') != 'ExportPhotos']
+        elif args.imports == 'pictures':
+           collection_tasks = [col.get('function')(url, col, headers) for col in collections if col.get('method') == 'ExportPhotos']
+        else:
+           collection_tasks = [col.get('function')(url, col, headers) for col in collections]
 
         await asyncio.gather(*collection_tasks)
         print("Taiga crawler ended successful !!!")

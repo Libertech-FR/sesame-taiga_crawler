@@ -5,6 +5,7 @@ from lib.data_weaver3 import weave_entry
 import aiohttp
 import dotenv
 import yaml
+import re
 
 dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
@@ -27,7 +28,7 @@ async def read_response(response):
     jsonMessage = json.loads(message)
     print(jsonMessage)
 
-async def send_request(session, url, json):
+async def send_request(session, url,exclusions, json):
     headers = {
         "Authorization": f"Bearer {sesame_api_token}",
         "Content-Type": "application/json; charset=utf-8",
@@ -36,7 +37,14 @@ async def send_request(session, url, json):
         "filters[inetOrgPerson.employeeNumber]": f"{json.get('inetOrgPerson', {}).get('employeeNumber')}",
         "filters[inetOrgPerson.employeeType]": "TAIGA",
     }
-
+    for regex in exclusions:
+        for r in regex:
+            value=json.get('inetOrgPerson').get(r)
+            if value:
+                result=re.search(regex[r],value)
+                if result != None:
+                    print(f"EXCLUDED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+                    return
     try:
 
         async with session.post(url, json=json, headers=headers, params=params) as response:
@@ -75,7 +83,8 @@ async def process_data(data, config, file, session):
     result = await get_data(data, config)
     with open(f'./data/{file}', 'w', encoding='utf-8') as fichier:
         json.dump(result, fichier, ensure_ascii=False, indent=4)
-    tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert', entry) for entry in result]
+    exclude=config.get('exclude',[])
+    tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert',config.get('exclude',[]),entry) for entry in result]
     await gather_with_concurrency(sesame_import_parallels_files, tasks)
     print(f"Processed {file}")
 
