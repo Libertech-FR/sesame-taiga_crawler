@@ -48,11 +48,11 @@ async def export_pictures(url, col, headers):
             current = json.load(open(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', 'r', encoding='utf-8'))
             compared = compare_fingerprints(current['data'], data[0][1])
 
-            if compared.__len__() > 0:
-                logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> Already exists moving to .old file !')
-                os.rename(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old')
-            else:
-                logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> All datas are the same !')
+            #if compared.__len__() > 0:
+            #    logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> Already exists moving to .old file !')
+            #    os.rename(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old')
+            #else:
+            #    logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> All datas are the same !')
 
         with open(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', 'w', encoding='utf-8') as fichier:
             json.dump(
