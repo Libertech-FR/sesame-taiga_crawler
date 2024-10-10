@@ -48,11 +48,11 @@ async def export_pictures(url, col, headers):
             current = json.load(open(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', 'r', encoding='utf-8'))
             compared = compare_fingerprints(current['data'], data[0][1])
 
-            if compared.__len__() > 0:
-                logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> Already exists moving to .old file !')
-                os.rename(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old')
-            else:
-                logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> All datas are the same !')
+            #if compared.__len__() > 0:
+            #    logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> Already exists moving to .old file !')
+            #    os.rename(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old')
+            #else:
+            #    logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> All datas are the same !')
 
         with open(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', 'w', encoding='utf-8') as fichier:
             json.dump(
@@ -67,24 +67,24 @@ async def export_pictures(url, col, headers):
             )
         logger.info(f"{col.get('method')}")
 
-        if os.path.exists(f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old'):
-            compare_now = compare_fingerprints(
-                json.load(open(f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old', 'r', encoding='utf-8'))['data'],
-                json.load(open(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', 'r', encoding='utf-8'))['data'],
-            )
+        #if os.path.exists(f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old'):
+        #    compare_now = compare_fingerprints(
+        #        json.load(open(f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old', 'r', encoding='utf-8'))['data'],
+        #        json.load(open(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', 'r', encoding='utf-8'))['data'],
+        #    )
+        #
+        #    if compare_now.__len__() > 0:
+        #        logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> Datas are different, starting exportation...')
+        #        for picture in compare_now:
+        #            await export_picture(url, col, headers, picture[0])
+        #    else:
+        #        logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> Datas are the same, nothing to do !')
+        #else:
+        logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> No old file found, starting exportation...')
+        for picture in data[0][1]:
+            await export_picture(url, col, headers, picture.get('ident'))
 
-            if compare_now.__len__() > 0:
-                logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> Datas are different, starting exportation...')
-                for picture in compare_now:
-                    await export_picture(url, col, headers, picture[0])
-            else:
-                logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> Datas are the same, nothing to do !')
-        else:
-            logger.info(f'<./cache/pictures/taiga_{col.get("params")["type"]}.json> No old file found, starting exportation...')
-            for picture in data[0][1]:
-                await export_picture(url, col, headers, picture.get('ident'))
-
-        copy_file(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old')
+        #copy_file(f'./cache/pictures/taiga_{col.get("params")["type"]}.json', f'./cache/pictures/taiga_{col.get("params")["type"]}.json.old')
     except requests.exceptions.HTTPError as e:
         logger.warning(f"Failed to insert {col.get('method')}: {e} \n {e.response.text}")
 
