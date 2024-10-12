@@ -2,6 +2,7 @@
 import re
 from typing import Any, Callable, Dict
 import unicodedata
+import ast
 
 def apply_to_value(value, func, *args, **kwargs):
     if isinstance(value, dict):
@@ -89,6 +90,11 @@ def remove_accents(value: str) -> str:
             return ''.join(c for c in unicodedata.normalize('NFD', val) if unicodedata.category(c) != 'Mn')
         return apply_to_value(value, remove_accents_val)
 
+def substr(value : str | list | dict, start:int, end:int)->str:
+    def substr_val(val):
+        return val[start:end]
+    return apply_to_value(value,substr_val)
+
 TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
     "capitalize": capitalize,
     "lower": lower,
@@ -103,6 +109,7 @@ TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
     "join": lambda value, delimiter='': join(value, delimiter),
     "replace": lambda value, old, new: replace(value, old, new),
     "regex": lambda value, pattern, replace: regex(value, pattern, replace),
+    "substr": lambda value, start=0, end=-1: substr(value, start, end)
 }
 
 def parse_args(args: str) -> dict:
