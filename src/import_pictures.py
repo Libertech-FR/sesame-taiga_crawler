@@ -97,13 +97,13 @@ async def import_pictures():
 
     files = list_files_in_dir('./cache/pictures')
 
-    # for file in files:
+    for file in files:
     #     if file.endswith(".old"):
     #         with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
     #             datasOld[file.split('.')[0]] = json.load(fichier).get('data')
     #     else:
-    with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
-        datasCurrent[file.split('.')[0]] = json.load(fichier).get('data')
+        with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
+            datasCurrent[file.split('.')[0]] = json.load(fichier).get('data')
 
     # for file in files:
     #     if datasOld.get(file.split('.')[0]) is not None:
