@@ -97,23 +97,23 @@ async def import_pictures():
 
     files = list_files_in_dir('./cache/pictures')
 
-    for file in files:
-        if file.endswith(".old"):
-            with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
-                datasOld[file.split('.')[0]] = json.load(fichier).get('data')
-        else:
-            with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
-                datasCurrent[file.split('.')[0]] = json.load(fichier).get('data')
+    # for file in files:
+    #     if file.endswith(".old"):
+    #         with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
+    #             datasOld[file.split('.')[0]] = json.load(fichier).get('data')
+    #     else:
+    with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
+        datasCurrent[file.split('.')[0]] = json.load(fichier).get('data')
 
-    for file in files:
-        if datasOld.get(file.split('.')[0]) is not None:
-            datas[file.split('.')[0]] = filter_datas(datasCurrent[file.split('.')[0]], datasOld[file.split('.')[0]])
-        else:
-            datas[file.split('.')[0]] = datasCurrent[file.split('.')[0]]
+    # for file in files:
+    #     if datasOld.get(file.split('.')[0]) is not None:
+    #         datas[file.split('.')[0]] = filter_datas(datasCurrent[file.split('.')[0]], datasOld[file.split('.')[0]])
+    #     else:
+    datas[file.split('.')[0]] = datasCurrent[file.split('.')[0]]
 
-    print(datasOld)
-    print(datasCurrent)
-    print(datas)
+    # print(datasOld)
+    # print(datasCurrent)
+    # print(datas)
 
     async with aiohttp.ClientSession() as session:
         tasks = [process_data(datas[entry], entry, session) for entry in datas]
