@@ -33,8 +33,11 @@ async def send_request(session, url,exclusions, json):
         "Authorization": f"Bearer {sesame_api_token}",
         "Content-Type": "application/json; charset=utf-8",
     }
+    employee_number_key=json.get('inetOrgPerson', {}).get('employeeNumber')
+    if employee_number_key is None:
+        employee_number_key = json.get('$setOnInsert',{}).get('inetOrgPerson', {}).get('employeeNumber')
     params = {
-        "filters[inetOrgPerson.employeeNumber]": f"{json.get('inetOrgPerson', {}).get('employeeNumber')}",
+        "filters[inetOrgPerson.employeeNumber]": employee_number_key,
         "filters[inetOrgPerson.employeeType]": "TAIGA",
     }
     for regex in exclusions:
@@ -43,22 +46,24 @@ async def send_request(session, url,exclusions, json):
             if value:
                 result=re.search(regex[r],value)
                 if result != None:
-                    print(f"EXCLUDED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+                    print(f"EXCLUDED {employee_number_key[0]} {json.get('inetOrgPerson', {}).get('cn')}")
                     return
     try:
 
         async with session.post(url, json=json, headers=headers, params=params) as response:
             #print(f"Request to {url} successful: {response.status}")
             if response.status == 304:
-                print(f"{response.status} UNMODIFIED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+                print(f"{response.status} UNMODIFIED {employee_number_key[0]} {json.get('inetOrgPerson', {}).get('cn')}")
+            elif response.status == 303:
+                print(f"{response.status} NOT CONCERNED FUSIONNED {employee_number_key[0]} {json.get('inetOrgPerson', {}).get('cn')}")
             elif response.status == 200:
-                print(f"{response.status} MODIFIED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+                print(f"{response.status} MODIFIED {employee_number_key[0]} {json.get('inetOrgPerson', {}).get('cn')}")
             elif response.status == 201:
-                print(f"{response.status} ADDED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+                print(f"{response.status} ADDED {employee_number_key[0]} {json.get('inetOrgPerson', {}).get('cn')}")
             elif response.status == 202:
-                print(f"{response.status} ADDED WiTH WARNiNG {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+                print(f"{response.status} ADDED WiTH WARNiNG {employee_number_key[0]} {json.get('inetOrgPerson', {}).get('cn')}")
             else:
-                print(f"{response.status} -- {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
+                print(f"{response.status} -- {employee_number_key[0]} {json.get('inetOrgPerson', {}).get('cn')}")
                 await read_response(response)
             response.raise_for_status()  # Raises error for 4xx/5xx responses
     except aiohttp.ClientResponseError as e:
@@ -84,13 +89,34 @@ async def process_data(data, config, file, session):
     with open(f'./data/{file}', 'w', encoding='utf-8') as fichier:
         json.dump(result, fichier, ensure_ascii=False, indent=4)
     exclude=config.get('exclude',[])
-    tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert',config.get('exclude',[]),entry) for entry in result]
-    await gather_with_concurrency(sesame_import_parallels_files, tasks)
+    for entry in result:
+        await send_request(session, f'{sesame_api_baseurl}/management/identities/upsert',config.get('exclude',[]),entry)
     print(f"Processed {file}")
 
 async def load_config():
+    orchestrator_version=await getVersion()
+    print (f"Orchestrator version : {orchestrator_version}")
     with open('./config.yml', 'r', encoding='utf-8') as fichier:
-        return yaml.load(fichier, Loader=yaml.FullLoader)
+        config = yaml.load(fichier, Loader=yaml.FullLoader)
+        if orchestrator_version > 116:
+            for f in config.keys():
+                test = config.get(f).get('mapping').get('inetOrgPerson.employeeNumber')
+                if test is None:
+                    test = config.get(f).get('mapping').get('$setOnInsert.inetOrgPerson.employeeNumber')
+                if test is None:
+                    print('Erreur: impossible de trouver le champs inetOrgPerson.employeeNumber')
+                    exit(1)
+                if type(test) != list:
+                    print(f"config.yml incompatible avec la version de l'orchestrator: {orchestrator_version}")
+                    print("Le champ inetOrgPerson.employeeNumber doit être de type multi-valeur")
+                    print("Exemple : ")
+                    print("inetOrgPerson.employeeNumber:")
+                    print("- id_coord")
+                    print("A la place de : ")
+                    print("inetOrgPerson.employeeNumber: id_coord")
+                    exit(1)
+        return config
+
 
 async def import_ind():
     configs = await load_config()
@@ -105,3 +131,14 @@ async def import_ind():
     async with aiohttp.ClientSession() as session:
         tasks = [process_data(datas[file], configs[file], file, session) for file in cache_files if file in configs.keys()]
         await gather_with_concurrency(sesame_import_parallels_files, tasks)
+
+
+async def getVersion():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(sesame_api_baseurl) as response:
+            json = await response.json()
+            version_str=json['version'].split('.')
+            version=int(version_str[0])*100 + int(version_str[1])*10 +int(version_str[2])
+            return(version)
+
+
