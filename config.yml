@@ -15,8 +15,6 @@ taiga_etd.json:
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
     $setOnInsert.inetOrgPerson.employeeNumber:
     - "id_coord"
-    inetOrgPerson.employeeNumber:
-    - "id_coord"
     customFields.photo: "photo_nom"
     $setOnInsert.inetOrgPerson.uid:
     - "prenom"
@@ -101,8 +99,6 @@ taiga_adm.json:
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
     $setOnInsert.inetOrgPerson.employeeNumber:
     - "id_coord"
-    inetOrgPerson.employeeNumber:
-    - "id_coord"
     customFields.photo: "photo_nom"
     $setOnInsert.inetOrgPerson.uid:
     - "prenom"
@@ -185,8 +181,6 @@ taiga_esn.json:
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
     $setOnInsert.inetOrgPerson.employeeNumber:
     - "id_coord"
-    inetOrgPerson.employeeNumber:
-    - "id_coord"
     customFileds.photo: "photo_nom"
     $setOnInsert.inetOrgPerson.uid:
     - "prenom"
@@ -231,7 +225,9 @@ taiga_esn.json:
     $setOnInsert.additionalFields.attributes.eduPerson.edupersonprimaryaffiliation: "teacher"
     $setOnInsert.additionalFields.attributes.sogxuser.sogxdisableflag: 0
   transforms:
-    additionalFields.attributes.supannPerson.supannRefId: "parse_type(typename='string')"
+    inetOrgPerson.cn: "join(delimiter=' ')"
+    additionalFields.attributes.supannPerson.supannRefId: "parse_type(typename='str')"
+    additionalFields.attributes.supannPerson.supannEmpId: "parse_type(typename='str')"
     inetOrgPerson.displayName: "join(delimiter=' ')"
     inetOrgPerson.postalAddress: "join(delimiter=',')"
     $setOnInsert.inetOrgPerson.uid:

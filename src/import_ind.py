@@ -29,8 +29,8 @@ async def read_response(response):
     print(jsonMessage)
 
 async def send_request(session, url,exclusions, json):
-    if (json.get('inetOrgPerson', {}).get('employeeNumber') == None):
-        print(f"MISSING employeeNumber {json.get('inetOrgPerson', {})}")
+    if (json.get('inetOrgPerson', {}).get('employeeNumber') == None and json.get('$setOnInsert', {}).get('inetOrgPerson', {}).get('employeeNumber') == None):
+        print(f"MISSING employeeNumber -> $set: {json.get('inetOrgPerson', {})}, $setOnInsert: {json.get('$setOnInsert', {}).get('inetOrgPerson', {})}")
         return
 
     headers = {
@@ -42,7 +42,7 @@ async def send_request(session, url,exclusions, json):
         "filters[inetOrgPerson.employeeType]": "TAIGA",
     }
 
-    employeeNumber = json.get('inetOrgPerson', {}).get('employeeNumber')
+    employeeNumber = json.get('inetOrgPerson', {}).get('employeeNumber') or json.get('$setOnInsert', {}).get('inetOrgPerson', {}).get('employeeNumber')
 
     if isinstance(employeeNumber, list):
         params["filters[inetOrgPerson.employeeNumber][]"] = employeeNumber
@@ -58,8 +58,7 @@ async def send_request(session, url,exclusions, json):
                     print(f"EXCLUDED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
                     return
     try:
-
-        print(params)
+        print(f"Sending request to {url} with query: {params}")
 
         async with session.post(url, json=json, headers=headers, params=params) as response:
             #print(f"Request to {url} successful: {response.status}")
