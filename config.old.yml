@@ -2,7 +2,6 @@
 taiga_etd.json:
   exclude:
     - sn: ^#
-    - givenName: ^#
   mapping:
     inetOrgPerson.cn:
     - "nom"
@@ -13,19 +12,13 @@ taiga_etd.json:
     inetOrgPerson.sn: "nom"
     inetOrgPerson.givenName: "prenom"
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
-    $setOnInsert.inetOrgPerson.employeeNumber:
-    - "id_coord"
     inetOrgPerson.employeeNumber:
     - "id_coord"
     customFields.photo: "photo_nom"
     $setOnInsert.inetOrgPerson.uid:
     - "prenom"
     - "nom"
-    additionalFields.attributes.supannPerson.supannEtuId: "num_etd"
     additionalFields.attributes.supannPerson.supannRefId:
-    - "id_coord"
-    - "id_etd"
-    $setOnInsert.inetOrgPerson.departmentEmployee:
     - "id_coord"
     $setOnInsert.inetOrgPerson.mail:
     - "prenom"
@@ -40,28 +33,17 @@ taiga_etd.json:
     additionalFields.attributes.supannPerson.supannNomdeNaissance: "nom_marital"
     additionalFields.attributes.supannPerson.supannOIDCDatedeNaissance: "nss_date"
     additionalFields.attributes.supannPerson.supannAutreMail: "email2"
-    additionalFields.attributes.eduPerson.edupersonprincipalname:
-    - "prenom"
-    - "nom"
-    customFields.photo: "photo_nom"
   additionalFields:
     additionalFields.objectClasses:
     - "supannPerson"
-    - "eduPerson"
-    - "sogxuser"
     additionalFields.attributes.supannPerson.supannTypeEntiteAffectation:
     - "etd"
+    additionalFields.attributes.supannPerson.supannEntiteAffectationPrincipale: "etd"
     state: -1
     inetOrgPerson.employeeType: "TAIGA"
-    $setOnInsert.inetOrgPerson.departmentNumber:
-    -  "etd"
-    additionalFields.attributes.supannPerson.supannEtablissement: "{UAI}0690184A"
-    $setOnInsert.additionalFields.attributes.eduPerson.edupersonaffiliation:
-    - "etudiant"
-    - "member"
-    $setOnInsert.additionalFields.attributes.eduPerson.edupersonprimaryaffiliation: "etudiant"
-    $setOnInsert.additionalFields.attributes.sogxuser.sogxquota: 600
-    $setOnInsert.additionalFields.attributes.sogxuser.sogxdisableflag: 0
+    inetOrgPerson.departmentNumber:
+    - "etd"
+    additionalFields.attributes.supannPerson.supannEtablissement: "{UAI}A123456"
   transforms:
     inetOrgPerson.cn: "join(delimiter=' ')"
     inetOrgPerson.displayName: "join(delimiter=' ')"
@@ -70,7 +52,7 @@ taiga_etd.json:
     - "join(delimiter='.')"
     - "remove_accents"
     - "lower"
-    - "replace(old=' ',new='-')"
+    - replace(old=' ',new='-')
     - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
     $setOnInsert.inetOrgPerson.mail:
     - "join(delimiter='.')"
@@ -78,17 +60,11 @@ taiga_etd.json:
     - "remove_accents"
     - "replace(old=' ',new='-')"
     - "suffix(string='@lyon.archi.fr')"
-    additionalFields.attributes.eduPerson.edupersonprincipalname:
-    - "join(delimiter='.')"
-    - "remove_accents"
-    - "lower"
-    - "replace(old=' ',new='-')"
-    - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
-    - "suffix(string='@lyon.archi.fr')"
+    additionalFields.attributes.supannPerson.supannRefId:
+    - "prefix(string='{TAIGA}')"
 taiga_adm.json:
   exclude:
     - sn: ^#
-    - givenName: ^#
   mapping:
     inetOrgPerson.cn:
     - "nom"
@@ -99,20 +75,14 @@ taiga_adm.json:
     inetOrgPerson.sn: "nom"
     inetOrgPerson.givenName: "prenom"
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
-    $setOnInsert.inetOrgPerson.employeeNumber:
-    - "id_coord"
     inetOrgPerson.employeeNumber:
     - "id_coord"
-    customFields.photo: "photo_nom"
     $setOnInsert.inetOrgPerson.uid:
     - "prenom"
     - "nom"
-    additionalFields.attributes.supannPerson.supannEmpId: "id_coord"
     additionalFields.attributes.supannPerson.supannRefId:
     - "id_coord"
-    - "id_adm"
-    $setOnInsert.inetOrgPerson.departmentEmployee:
-    - "id_coord"
+    additionalFields.attributes.supannPerson.supannEmpId: "id_coord"
     $setOnInsert.inetOrgPerson.mail:
     - "prenom"
     - "nom"
@@ -126,26 +96,17 @@ taiga_adm.json:
     additionalFields.attributes.supannPerson.supannNomdeNaissance: "nom_marital"
     additionalFields.attributes.supannPerson.supannOIDCDatedeNaissance: "nss_date"
     additionalFields.attributes.supannPerson.supannAutreMail: "email2"
-    additionalFields.attributes.eduPerson.edupersonprincipalname:
-    - "prenom"
-    - "nom"
   additionalFields:
     additionalFields.objectClasses:
     - "supannPerson"
-    - "eduPerson"
-    - "sogxuser"
     additionalFields.attributes.supannPerson.supannTypeEntiteAffectation:
     - "adm"
-    additionalFields.attributes.supannPerson.supannEtablissement: "{UAI}0690184A"
+    additionalFields.attributes.supannPerson.supannEntiteAffectationPrincipale: "adm"
+    additionalFields.attributes.supannPerson.supannEtablissement: "{UAI}A123456"
     inetOrgPerson.employeeType: "TAIGA"
-    $setOnInsert.inetOrgPerson.departmentNumber:
-    -  "adm"
+    inetOrgPerson.departmentNumber:
+    - "adm"
     state: -1
-    $setOnInsert.additionalFields.attributes.eduPerson.edupersonaffiliation:
-    - "staff"
-    - "member"
-    $setOnInsert.additionalFields.attributes.eduPerson.edupersonprimaryaffiliation: "staff"
-    $setOnInsert.additionalFields.attributes.sogxuser.sogxdisableflag: 0
   transforms:
     inetOrgPerson.cn: "join(delimiter=' ')"
     inetOrgPerson.displayName: "join(delimiter=' ')"
@@ -162,17 +123,11 @@ taiga_adm.json:
     - "lower"
     - "replace(old=' ',new='-')"
     - "suffix(string='@lyon.archi.fr')"
-    additionalFields.attributes.eduPerson.edupersonprincipalname:
-    - "join(delimiter='.')"
-    - "remove_accents"
-    - "lower"
-    - "replace(old=' ',new='-')"
-    - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
-    - "suffix(string='@lyon.archi.fr')"
+    additionalFields.attributes.supannPerson.supannRefId:
+    - "prefix(string='{TAIGA}')"
 taiga_esn.json:
   exclude:
     - sn: ^#
-    - givenName: ^#
   mapping:
     inetOrgPerson.cn:
     - "nom"
@@ -183,19 +138,13 @@ taiga_esn.json:
     inetOrgPerson.sn: "nom"
     inetOrgPerson.givenName: "prenom"
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
-    $setOnInsert.inetOrgPerson.employeeNumber:
-    - "id_coord"
     inetOrgPerson.employeeNumber:
     - "id_coord"
-    customFileds.photo: "photo_nom"
     $setOnInsert.inetOrgPerson.uid:
     - "prenom"
     - "nom"
     additionalFields.attributes.supannPerson.supannEmpId: "id_coord"
     additionalFields.attributes.supannPerson.supannRefId:
-    - "id_coord"
-    - "id_ens"
-    $setOnInsert.inetOrgPerson.departmentEmployee:
     - "id_coord"
     $setOnInsert.inetOrgPerson.mail:
     - "prenom"
@@ -210,34 +159,26 @@ taiga_esn.json:
     additionalFields.attributes.supannPerson.supannNomdeNaissance: "nom_marital"
     additionalFields.attributes.supannPerson.supannOIDCDatedeNaissance: "nss_date"
     additionalFields.attributes.supannPerson.supannAutreMail: "email2"
-    additionalFields.attributes.eduPerson.edupersonprincipalname:
-    - "prenom"
-    - "nom"
   additionalFields:
     additionalFields.objectClasses:
     - "supannPerson"
-    - "eduPerson"
-    - "sogxuser"
     additionalFields.attributes.supannPerson.supannTypeEntiteAffectation:
     - "esn"
-    additionalFields.attributes.supannPerson.supannEtablissement: "{UAI}0690184A"
-    $setOnInsert.inetOrgPerson.departmentNumber:
+    additionalFields.attributes.supannPerson.supannEntiteAffectationPrincipale: "esn"
+    additionalFields.attributes.supannPerson.supannEtablissement: "{UAI}A123456"
+    inetOrgPerson.departmentNumber:
     - "esn"
     inetOrgPerson.employeeType: "TAIGA"
     state: -1
-    $setOnInsert.additionalFields.attributes.eduPerson.edupersonaffiliation:
-    - "teacher"
-    - "member"
-    $setOnInsert.additionalFields.attributes.eduPerson.edupersonprimaryaffiliation: "teacher"
-    $setOnInsert.additionalFields.attributes.sogxuser.sogxdisableflag: 0
   transforms:
-    additionalFields.attributes.supannPerson.supannRefId: "parse_type(typename='string')"
+    inetOrgPerson.cn: "join(delimiter=' ')"
     inetOrgPerson.displayName: "join(delimiter=' ')"
     inetOrgPerson.postalAddress: "join(delimiter=',')"
     $setOnInsert.inetOrgPerson.uid:
     - "join(delimiter='.')"
     - "remove_accents"
     - "lower"
+    - "replace(old=' ',new='-')"
     - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
     $setOnInsert.inetOrgPerson.mail:
     - "join(delimiter='.')"
@@ -245,10 +186,5 @@ taiga_esn.json:
     - "lower"
     - "replace(old=' ',new='-')"
     - "suffix(string='@lyon.archi.fr')"
-    additionalFields.attributes.eduPerson.edupersonprincipalname:
-    - "join(delimiter='.')"
-    - "remove_accents"
-    - "lower"
-    - "replace(old=' ',new='-')"
-    - "regex(pattern='(?<=\\b\\w)([a-zA-Z0-9_\\-]+\\.)', replace='')"
-    - "suffix(string='@lyon.archi.fr')"
+    additionalFields.attributes.supannPerson.supannRefId:
+    - "prefix(string='{TAIGA}')"
