@@ -83,6 +83,34 @@ collections = [
             **ensa_infos,
         },
     },
+    {
+        "function": export_pictures,
+        "method": "ExportPhotos",
+        "methodBase64": "ExportPhoto",
+        "params": {
+            **ensa_infos,
+            "type": "adm",
+            "id": "*",
+        },
+        "paramsBase64": {
+            "type": "adm",
+            **ensa_infos,
+        },
+    },
+    {
+        "function": export_pictures,
+        "method": "ExportPhotos",
+        "methodBase64": "ExportPhoto",
+        "params": {
+            **ensa_infos,
+            "type": "esn",
+            "id": "*",
+        },
+        "paramsBase64": {
+            "type": "esn",
+            **ensa_infos,
+        },
+    },
 ]
 
 
