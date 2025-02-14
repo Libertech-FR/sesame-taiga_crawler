@@ -28,7 +28,7 @@ async def read_response(response):
     jsonMessage = json.loads(message)
     print(jsonMessage)
 
-async def send_request(session, url,exclusions, json):
+async def send_request(session, url,exclusions, json, force):
     if (json.get('inetOrgPerson', {}).get('employeeNumber') == None and json.get('$setOnInsert', {}).get('inetOrgPerson', {}).get('employeeNumber') == None):
         print(f"MISSING employeeNumber -> $set: {json.get('inetOrgPerson', {})}, $setOnInsert: {json.get('$setOnInsert', {}).get('inetOrgPerson', {})}")
         return
@@ -40,6 +40,7 @@ async def send_request(session, url,exclusions, json):
     params = {
     #     "filters[inetOrgPerson.employeeNumber]": f"{json.get('inetOrgPerson', {}).get('employeeNumber')}",
         "filters[inetOrgPerson.employeeType]": "TAIGA",
+        "force": force,
     }
 
     employeeNumber = json.get('inetOrgPerson', {}).get('employeeNumber') or json.get('$setOnInsert', {}).get('inetOrgPerson', {}).get('employeeNumber')
@@ -91,13 +92,13 @@ async def get_data(data, config):
 
 
 
-async def process_data(data, config, file, session):
+async def process_data(data, config, file, session, force):
     print(f"Processing {file}")
     result = await get_data(data, config)
     with open(f'./data/{file}', 'w', encoding='utf-8') as fichier:
         json.dump(result, fichier, ensure_ascii=False, indent=4)
     exclude=config.get('exclude',[])
-    tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert',config.get('exclude',[]),entry) for entry in result]
+    tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert',config.get('exclude',[]),entry, force) for entry in result]
     await gather_with_concurrency(sesame_import_parallels_files, tasks)
     print(f"Processed {file}")
 
@@ -105,7 +106,7 @@ async def load_config():
     with open('./config.yml', 'r', encoding='utf-8') as fichier:
         return yaml.load(fichier, Loader=yaml.FullLoader)
 
-async def import_ind():
+async def import_ind(force: bool):
     configs = await load_config()
     cache_files = os.listdir('./cache')
     datas = {}
@@ -116,5 +117,5 @@ async def import_ind():
               datas[file] = json.load(fichier).get('data')
 
     async with aiohttp.ClientSession() as session:
-        tasks = [process_data(datas[file], configs[file], file, session) for file in cache_files if file in configs.keys()]
+        tasks = [process_data(datas[file], configs[file], file, session, force) for file in cache_files if file in configs.keys()]
         await gather_with_concurrency(sesame_import_parallels_files, tasks)

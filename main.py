@@ -118,7 +118,8 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', help='all | taiga | sesame',default='all')
     parser.add_argument('--imports', help='all | ind | pictures',default='all')
-    parser.add_argument('--an', help='Année universitaire à importer ',default="0")
+    parser.add_argument('--an', help='Année universitaire à importer',default="0")
+    parser.add_argument('--force', help="Force l'import et bypass le check du fingerprint",default="0")
     args = parser.parse_args()
     if args.an != 0:
         print(f"Import pour l'annee {args.an}")
@@ -148,7 +149,7 @@ async def main():
         print(f"Imports: {args.imports}")
         start_time = datetime.now()
         if (args.imports == 'ind' or args.imports == 'all'):
-            await import_ind()
+            await import_ind(args.force)
         if (args.imports == 'pictures' or args.imports == 'all'):
             await import_pictures()
         end_time = datetime.now()
