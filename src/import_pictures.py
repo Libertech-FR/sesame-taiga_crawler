@@ -115,6 +115,7 @@ async def import_pictures():
     # print(datasCurrent)
     # print(datas)
 
-    async with aiohttp.ClientSession() as session:
+    connector = aiohttp.TCPConnector(ssl=False)
+    async with aiohttp.ClientSession(connector=connector) as session:
         tasks = [process_data(datas[entry], entry, session) for entry in datas]
         await gather_with_concurrency(sesame_import_parallels_files, tasks)
