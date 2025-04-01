@@ -116,6 +116,7 @@ async def import_ind(force: bool):
           with open(f'./cache/{file}', 'r', encoding='utf-8') as fichier:
               datas[file] = json.load(fichier).get('data')
 
-    async with aiohttp.ClientSession() as session:
+    connector = aiohttp.TCPConnector(ssl=False)
+    async with aiohttp.ClientSession(connector=connector) as session:
         tasks = [process_data(datas[file], configs[file], file, session, force) for file in cache_files if file in configs.keys()]
         await gather_with_concurrency(sesame_import_parallels_files, tasks)
