@@ -47,6 +47,15 @@ collections = [
         "method": "ExportInd",
         "params": {
             **ensa_infos,
+            "type": "pri",
+            "id": "*",
+        },
+    },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
             "type": "etd",
             "id": "*",
         },
