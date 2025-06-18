@@ -51,75 +51,75 @@ collections = [
             "id": "*",
         },
     },
-    {
-        "function": export_ind,
-        "method": "ExportInd",
-        "params": {
-            **ensa_infos,
-            "type": "etd",
-            "id": "*",
-        },
-    },
-    {
-        "function": export_ind,
-        "method": "ExportInd",
-        "params": {
-            **ensa_infos,
-            "type": "adm",
-            "id": "*",
-        },
-    },
-    {
-        "function": export_ind,
-        "method": "ExportInd",
-        "params": {
-            **ensa_infos,
-            "type": "esn",
-            "id": "*",
-        },
-    },
-    {
-        "function": export_pictures,
-        "method": "ExportPhotos",
-        "methodBase64": "ExportPhoto",
-        "params": {
-            **ensa_infos,
-            "type": "etd",
-            "id": "*",
-        },
-        "paramsBase64": {
-            "type": "etd",
-            **ensa_infos,
-        },
-    },
-    {
-        "function": export_pictures,
-        "method": "ExportPhotos",
-        "methodBase64": "ExportPhoto",
-        "params": {
-            **ensa_infos,
-            "type": "adm",
-            "id": "*",
-        },
-        "paramsBase64": {
-            "type": "adm",
-            **ensa_infos,
-        },
-    },
-    {
-        "function": export_pictures,
-        "method": "ExportPhotos",
-        "methodBase64": "ExportPhoto",
-        "params": {
-            **ensa_infos,
-            "type": "esn",
-            "id": "*",
-        },
-        "paramsBase64": {
-            "type": "esn",
-            **ensa_infos,
-        },
-    },
+    # {
+    #     "function": export_ind,
+    #     "method": "ExportInd",
+    #     "params": {
+    #         **ensa_infos,
+    #         "type": "etd",
+    #         "id": "*",
+    #     },
+    # },
+    # {
+    #     "function": export_ind,
+    #     "method": "ExportInd",
+    #     "params": {
+    #         **ensa_infos,
+    #         "type": "adm",
+    #         "id": "*",
+    #     },
+    # },
+    # {
+    #     "function": export_ind,
+    #     "method": "ExportInd",
+    #     "params": {
+    #         **ensa_infos,
+    #         "type": "esn",
+    #         "id": "*",
+    #     },
+    # },
+    # {
+    #     "function": export_pictures,
+    #     "method": "ExportPhotos",
+    #     "methodBase64": "ExportPhoto",
+    #     "params": {
+    #         **ensa_infos,
+    #         "type": "etd",
+    #         "id": "*",
+    #     },
+    #     "paramsBase64": {
+    #         "type": "etd",
+    #         **ensa_infos,
+    #     },
+    # },
+    # {
+    #     "function": export_pictures,
+    #     "method": "ExportPhotos",
+    #     "methodBase64": "ExportPhoto",
+    #     "params": {
+    #         **ensa_infos,
+    #         "type": "adm",
+    #         "id": "*",
+    #     },
+    #     "paramsBase64": {
+    #         "type": "adm",
+    #         **ensa_infos,
+    #     },
+    # },
+    # {
+    #     "function": export_pictures,
+    #     "method": "ExportPhotos",
+    #     "methodBase64": "ExportPhoto",
+    #     "params": {
+    #         **ensa_infos,
+    #         "type": "esn",
+    #         "id": "*",
+    #     },
+    #     "paramsBase64": {
+    #         "type": "esn",
+    #         **ensa_infos,
+    #     },
+    # },
 ]
 
 

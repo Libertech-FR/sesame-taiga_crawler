@@ -52,9 +52,23 @@ async def send_request(session, url,exclusions, json, force):
 
     for regex in exclusions:
         for r in regex:
-            value=json.get('inetOrgPerson').get(r)
+            # Handle nested attributes with dot notation (parent.enfant ...)
+            if '.' in r:
+                parts = r.split('.')
+                current = json
+                for part in parts:
+                    if current and isinstance(current, dict) and part in current:
+                        current = current.get(part)
+                    else:
+                        current = None
+                        break
+                value = current
+            else:
+                # Default to inetOrgPerson if no dot in attribute name
+                value = json.get('inetOrgPerson', {}).get(r)
+
             if value:
-                result=re.search(regex[r],value)
+                result = re.search(regex[r], value)
                 if result != None:
                     print(f"EXCLUDED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
                     return
