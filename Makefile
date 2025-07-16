@@ -8,6 +8,7 @@ PLATFORM = "linux/amd64"
 STC_RUN = "all"
 STC_IMPORTS = "all"
 STC_FORCE = "0"
+STC_AN = "0"
 include .env
 
 .DEFAULT_GOAL := help
@@ -31,7 +32,7 @@ run-crawler-docker: ## Lance le crawler Sesame - Taiga avec python !
 		--platform $(PLATFORM) \
 		--name $(APP_NAME) \
 		-v $(CURDIR):/data \
-		$(IMG_NAME) python main.py --run=$(STC_RUN) --imports=$(STC_IMPORTS) --force $(STC_FORCE)
+		$(IMG_NAME) python main.py --run=$(STC_RUN) --an=$(STC_AN) --imports=$(STC_IMPORTS) --force $(STC_FORCE)
 
 run-crawler: ## Lance le crawler Sesame - Taiga avec python !
 	@python3 main.py

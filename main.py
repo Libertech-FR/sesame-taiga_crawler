@@ -38,7 +38,7 @@ ensa_infos = {
     "pass_ensa": hashlib.sha1(ensa_pass.encode()).hexdigest(),
 }
 
-# print(ensa_infos)
+print(ensa_infos)
 # print(headers)
 
 collections = [
@@ -51,75 +51,75 @@ collections = [
             "id": "*",
         },
     },
-    # {
-    #     "function": export_ind,
-    #     "method": "ExportInd",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "etd",
-    #         "id": "*",
-    #     },
-    # },
-    # {
-    #     "function": export_ind,
-    #     "method": "ExportInd",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "adm",
-    #         "id": "*",
-    #     },
-    # },
-    # {
-    #     "function": export_ind,
-    #     "method": "ExportInd",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "esn",
-    #         "id": "*",
-    #     },
-    # },
-    # {
-    #     "function": export_pictures,
-    #     "method": "ExportPhotos",
-    #     "methodBase64": "ExportPhoto",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "etd",
-    #         "id": "*",
-    #     },
-    #     "paramsBase64": {
-    #         "type": "etd",
-    #         **ensa_infos,
-    #     },
-    # },
-    # {
-    #     "function": export_pictures,
-    #     "method": "ExportPhotos",
-    #     "methodBase64": "ExportPhoto",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "adm",
-    #         "id": "*",
-    #     },
-    #     "paramsBase64": {
-    #         "type": "adm",
-    #         **ensa_infos,
-    #     },
-    # },
-    # {
-    #     "function": export_pictures,
-    #     "method": "ExportPhotos",
-    #     "methodBase64": "ExportPhoto",
-    #     "params": {
-    #         **ensa_infos,
-    #         "type": "esn",
-    #         "id": "*",
-    #     },
-    #     "paramsBase64": {
-    #         "type": "esn",
-    #         **ensa_infos,
-    #     },
-    # },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "etd",
+            "id": "*",
+        },
+    },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "adm",
+            "id": "*",
+        },
+    },
+    {
+        "function": export_ind,
+        "method": "ExportInd",
+        "params": {
+            **ensa_infos,
+            "type": "esn",
+            "id": "*",
+        },
+    },
+    {
+        "function": export_pictures,
+        "method": "ExportPhotos",
+        "methodBase64": "ExportPhoto",
+        "params": {
+            **ensa_infos,
+            "type": "etd",
+            "id": "*",
+        },
+        "paramsBase64": {
+            "type": "etd",
+            **ensa_infos,
+        },
+    },
+    {
+        "function": export_pictures,
+        "method": "ExportPhotos",
+        "methodBase64": "ExportPhoto",
+        "params": {
+            **ensa_infos,
+            "type": "adm",
+            "id": "*",
+        },
+        "paramsBase64": {
+            "type": "adm",
+            **ensa_infos,
+        },
+    },
+    {
+        "function": export_pictures,
+        "method": "ExportPhotos",
+        "methodBase64": "ExportPhoto",
+        "params": {
+            **ensa_infos,
+            "type": "esn",
+            "id": "*",
+        },
+        "paramsBase64": {
+            "type": "esn",
+            **ensa_infos,
+        },
+    },
 ]
 
 
@@ -130,10 +130,21 @@ async def main():
     parser.add_argument('--an', help='Année universitaire à importer',default="0")
     parser.add_argument('--force', help="Force l'import et bypass le check du fingerprint",default="0")
     args = parser.parse_args()
-    if args.an != 0:
-        print(f"Import pour l'annee {args.an}")
+    if args.an != '0':
+        print(f"Import pour l'annee <{args.an}>")
+        if args.an.isdigit():
+            args.an = int(args.an)
+        if args.an < 2000 or args.an > datetime.now().year + 1:
+            print("Année invalide, doit être entre 2000 et l'année en cours + 1")
+            sys.exit(1)
+
         for col in collections:
-            col.get('params')['au']=int(args.an)
+            col.get('params')['au']=args.an
+    else:
+        annee_en_cours = datetime.now().year
+        print("Import pour l'annee en cours <" + str(annee_en_cours) + ">")
+        for col in collections:
+            col.get('params')['au']=annee_en_cours
 
     if args.run == 'taiga' or args.run == 'all':
         logger.info("Starting Taiga ind/pictures crawler...")

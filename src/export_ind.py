@@ -18,6 +18,13 @@ async def export_ind(url, col, headers):
         "params": col.get("params"),
         "id": str(uuid.uuid4()),
     }
+
+    if col.get('params').get('type') == 'pri':
+        payload['params']['au'] = int(col.get('params').get('au')) + 1
+        print("Type primo détecté, ajout de +1 à l'année: <" + str(payload['params']['au']) + ">")
+    else:
+        print("Type " + col.get('params').get('type') + " détecté, pas d'ajout à l'année: <" + str(col.get('params').get('au')) + ">")
+
     try:
         response = requests.post(url, json=payload, headers=headers, verify=False, timeout=10000)
         response.raise_for_status()
