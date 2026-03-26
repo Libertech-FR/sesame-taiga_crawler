@@ -1,4 +1,14 @@
-# Sesame - Taiga Crawler
+<p align="center">
+  <a href="https://libertech-fr.github.io/sesame-taiga_crawler" target="blank"><img src="./static/sesame-logo.svg" width="200" alt="Sesame Logo" /></a>
+</p>
+<p align="center">Sésame Taiga Crawler - Importation de données</p>
+<p align="center">
+  <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/libertech-fr/sesame-taiga_crawler/total">
+  <img alt="GitHub" src="https://img.shields.io/github/license/libertech-fr/sesame-taiga_crawler">
+  <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/libertech-fr/sesame-taiga_crawler">
+  <a href="https://github.com/Libertech-Fr/sesame-taiga_crawler/actions/workflows/release.yml?event=workflow_dispatch"><img alt="GitHub contributors" src="https://github.com/Libertech-Fr/sesame-taiga_crawler/actions/workflows/release.yml/badge.svg"></a>
+</p>
+<br>
 
 Le Sesame - Taiga Crawler est un projet Python qui interagit avec l'API Taiga pour effectuer des tâches spécifiques.
 
