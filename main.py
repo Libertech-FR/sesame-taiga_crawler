@@ -10,7 +10,8 @@ import argparse
 
 from src.a_moins_b import a_moins_b
 from src.export_pictures import export_pictures
-from src.export_ind import export_ind
+from src.export_oasis import export_oasis
+from src.import_ind import import_ind
 from src.import_ind import import_ind
 from src.import_pictures import import_pictures
 
@@ -24,108 +25,42 @@ basic_auth = [
 ]
 basic_auth = [value for value in basic_auth if value is not None]
 joined_auth = ':'.join(map(str, basic_auth)).encode('utf-8')
-
-
-url = f"{os.getenv('STC_API_BASEURL', 'https://taiga.archi.fr')}/taiga_libext/JsonRPC/api.php"
+ensa_infos={}
+ensa_pass=""
+if( os.getenv('SOURCE','TAIGA') == 'TAIGA'):
+    url = f"{os.getenv('STC_API_BASEURL', 'https://taiga.archi.fr')}/taiga_libext/JsonRPC/api.php"
+    ensa_pass = os.getenv('STC_API_PASSENSA') + datetime.now().strftime('%Y%m%d')
+    ensa_infos = {
+        "code_ensa": os.getenv('STC_API_CODEENSA', 'lyon'),
+        "pass_ensa": hashlib.sha1(ensa_pass.encode()).hexdigest(),
+    }
+    print(ensa_infos)
+else:
+    url=os.getenv('STC_API_BASEURL', '')
 headers = {
     "Authorization": f"Basic {base64.b64encode(joined_auth).decode('utf-8')}",
     "Content-Type": "application/json; charset=utf-8",
 }
 
-ensa_pass = os.getenv('STC_API_PASSENSA') + datetime.now().strftime('%Y%m%d')
-ensa_infos = {
-    "code_ensa": os.getenv('STC_API_CODEENSA', 'lyon'),
-    "pass_ensa": hashlib.sha1(ensa_pass.encode()).hexdigest(),
-}
-
-print(ensa_infos)
 # print(headers)
 
 collections = [
     {
-        "function": export_ind,
-        "method": "ExportInd",
-        "params": {
-            **ensa_infos,
-            "type": "pri",
-            "id": "*",
-        },
-    },
-    {
-        "function": export_ind,
-        "method": "ExportInd",
+        "function": export_oasis,
+        "method": "student",
         "params": {
             **ensa_infos,
             "type": "etd",
             "id": "*",
         },
     },
-    {
-        "function": export_ind,
-        "method": "ExportInd",
-        "params": {
-            **ensa_infos,
-            "type": "adm",
-            "id": "*",
-        },
-    },
-    {
-        "function": export_ind,
-        "method": "ExportInd",
-        "params": {
-            **ensa_infos,
-            "type": "esn",
-            "id": "*",
-        },
-    },
-    {
-        "function": export_pictures,
-        "method": "ExportPhotos",
-        "methodBase64": "ExportPhoto",
-        "params": {
-            **ensa_infos,
-            "type": "etd",
-            "id": "*",
-        },
-        "paramsBase64": {
-            "type": "etd",
-            **ensa_infos,
-        },
-    },
-    {
-        "function": export_pictures,
-        "method": "ExportPhotos",
-        "methodBase64": "ExportPhoto",
-        "params": {
-            **ensa_infos,
-            "type": "adm",
-            "id": "*",
-        },
-        "paramsBase64": {
-            "type": "adm",
-            **ensa_infos,
-        },
-    },
-    {
-        "function": export_pictures,
-        "method": "ExportPhotos",
-        "methodBase64": "ExportPhoto",
-        "params": {
-            **ensa_infos,
-            "type": "esn",
-            "id": "*",
-        },
-        "paramsBase64": {
-            "type": "esn",
-            **ensa_infos,
-        },
-    },
+
 ]
 
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--run', help='all | taiga | sesame',default='all')
+    parser.add_argument('--run', help='all | taiga | sesame | oasys',default='all')
     parser.add_argument('--imports', help='all | ind | pictures',default='all')
     parser.add_argument('--an', help='Année universitaire à importer',default="0")
     parser.add_argument('--force', help="Force l'import et bypass le check du fingerprint",default="0")
@@ -149,7 +84,8 @@ async def main():
     if args.run == 'taiga' or args.run == 'all':
         logger.info("Starting Taiga ind/pictures crawler...")
         print(f"Imports: {args.imports}")
-        await a_moins_b(url, 0, -1, headers)
+        if (os.getenv('SOURCE','TAIGA') == 'TAIGA'):
+            await a_moins_b(url, 0, -1, headers)
         # suppression des fichiers cache
         listjson=glob.glob('./cache/*.json')
         for file in listjson:

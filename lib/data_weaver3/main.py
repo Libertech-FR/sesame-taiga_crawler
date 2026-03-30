@@ -188,8 +188,9 @@ async def load_config(configContent=None):
         dict: The configuration dictionary.
 
     """
+    config_file=os.getenv('CONFIG_FILE_TRANSFORM','./config/config.yml')
     if configContent is None:
-        async with aiofiles.open('./config/config.yml', 'r', encoding='utf8') as file:
+        async with aiofiles.open(config_file, 'r', encoding='utf8') as file:
             content = await file.read()
             configContent = yaml.load(content, Loader=Loader)
     config.update(configContent)

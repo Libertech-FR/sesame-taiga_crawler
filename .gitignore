@@ -8,3 +8,5 @@ bin/
 pyvenv.cfg
 config.yml
 lib/*
+config.yml
+.DS_Store

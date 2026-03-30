@@ -1,5 +1,6 @@
 
 import re
+import typing
 from typing import Any, Callable, Dict
 import unicodedata
 import ast
@@ -38,12 +39,12 @@ def parse_type(value, typename: str) -> type:
     except KeyError:
         raise ValueError(f"Invalid type {typename}")
 
-def prefix(value: str | list | dict, prefix: str) -> str:
+def prefix(value: typing.Union[str,list,dict], prefix: str) -> str:
     def prefix_val(val):
         return f"{prefix}{val}"
     return apply_to_value(value, prefix_val)
 
-def suffix(value: str | list | dict, suffix: str) -> str:
+def suffix(value: typing.Union[str,list,dict], suffix: str) -> str:
     def suffix_val(val):
         return f"{val}{suffix}"
     return apply_to_value(value, suffix_val)
@@ -60,27 +61,27 @@ def join(values: list, delimiter: str = ' ') -> str:
             r.append(v)
     return delimiter.join(r)
 
-def lower(value: str | list | dict) -> str:
+def lower(value: typing.Union[str,list,dict]) -> str:
     def lower_val(val):
         return val.lower()
     return apply_to_value(value, lower_val)
 
-def title(value: str | list | dict) -> str:
+def title(value: typing.Union[str,list,dict]) -> str:
     def title_val(val):
         return val.title()
     return apply_to_value(value, title_val)
 
-def upper(value: str | list | dict) -> str:
+def upper(value:typing.Union[str,list,dict]) -> str:
     def upper_val(val):
         return val.upper()
     return apply_to_value(value, upper_val)
 
-def replace(value: str | list | dict, old: str, new: str) -> str:
+def replace(value: typing.Union[str,list,dict], old: str, new: str) -> str:
     def replace_val(val):
         return val.replace(old, new)
     return apply_to_value(value, replace_val)
 
-def regex(value: str | list | dict, pattern: str, replace: str) -> str:
+def regex(value: typing.Union[str,list,dict], pattern: str, replace: str) -> str:
     def regex_replace(val):
         return re.sub(pattern, replace, val)
     return apply_to_value(value, regex_replace)
@@ -90,7 +91,7 @@ def remove_accents(value: str) -> str:
             return ''.join(c for c in unicodedata.normalize('NFD', val) if unicodedata.category(c) != 'Mn')
         return apply_to_value(value, remove_accents_val)
 
-def substr(value : str | list | dict, start:int, end:int)->str:
+def substr(value : typing.Union[str,list,dict], start:int, end:int)->str:
     def substr_val(val):
         return val[start:end]
     return apply_to_value(value,substr_val)

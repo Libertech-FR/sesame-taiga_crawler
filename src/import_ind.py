@@ -117,7 +117,8 @@ async def process_data(data, config, file, session, force):
     print(f"Processed {file}")
 
 async def load_config():
-    with open('./config.yml', 'r', encoding='utf-8') as fichier:
+    config_file=os.getenv('CONFIG_FILE_TRANSFORM','./config.yml')
+    with open(config_file, 'r', encoding='utf-8') as fichier:
         return yaml.load(fichier, Loader=yaml.FullLoader)
 
 async def import_ind(force: bool):
