@@ -27,6 +27,7 @@ basic_auth = [value for value in basic_auth if value is not None]
 joined_auth = ':'.join(map(str, basic_auth)).encode('utf-8')
 ensa_infos={}
 ensa_pass=""
+collections=[]
 if( os.getenv('SOURCE','TAIGA') == 'TAIGA'):
     url = f"{os.getenv('STC_API_BASEURL', 'https://taiga.archi.fr')}/taiga_libext/JsonRPC/api.php"
     ensa_pass = os.getenv('STC_API_PASSENSA') + datetime.now().strftime('%Y%m%d')
@@ -34,28 +35,107 @@ if( os.getenv('SOURCE','TAIGA') == 'TAIGA'):
         "code_ensa": os.getenv('STC_API_CODEENSA', 'lyon'),
         "pass_ensa": hashlib.sha1(ensa_pass.encode()).hexdigest(),
     }
+    collections = [
+        {
+            "function": export_ind,
+            "method": "ExportInd",
+            "params": {
+                **ensa_infos,
+                "type": "pri",
+                "id": "*",
+            },
+        },
+        {
+            "function": export_ind,
+            "method": "ExportInd",
+            "params": {
+                **ensa_infos,
+                "type": "etd",
+                "id": "*",
+            },
+        },
+        {
+            "function": export_ind,
+            "method": "ExportInd",
+            "params": {
+                **ensa_infos,
+                "type": "adm",
+                "id": "*",
+            },
+        },
+        {
+            "function": export_ind,
+            "method": "ExportInd",
+            "params": {
+                **ensa_infos,
+                "type": "esn",
+                "id": "*",
+            },
+        },
+        {
+            "function": export_pictures,
+            "method": "ExportPhotos",
+            "methodBase64": "ExportPhoto",
+            "params": {
+                **ensa_infos,
+                "type": "etd",
+                "id": "*",
+            },
+            "paramsBase64": {
+                "type": "etd",
+                **ensa_infos,
+            },
+        },
+        {
+            "function": export_pictures,
+            "method": "ExportPhotos",
+            "methodBase64": "ExportPhoto",
+            "params": {
+                **ensa_infos,
+                "type": "adm",
+                "id": "*",
+            },
+            "paramsBase64": {
+                "type": "adm",
+                **ensa_infos,
+            },
+        },
+        {
+            "function": export_pictures,
+            "method": "ExportPhotos",
+            "methodBase64": "ExportPhoto",
+            "params": {
+                **ensa_infos,
+                "type": "esn",
+                "id": "*",
+            },
+            "paramsBase64": {
+                "type": "esn",
+                **ensa_infos,
+            },
+        },
+    ]
     print(ensa_infos)
 else:
     url=os.getenv('STC_API_BASEURL', '')
+    collections = [
+        {
+            "function": export_oasis,
+            "method": "student",
+            "params": {
+                **ensa_infos,
+                "type": "etd",
+                "id": "*",
+            },
+        }
+    ]
+
 headers = {
     "Authorization": f"Basic {base64.b64encode(joined_auth).decode('utf-8')}",
     "Content-Type": "application/json; charset=utf-8",
 }
 
 # print(headers)
-
-collections = [
-    {
-        "function": export_oasis,
-        "method": "student",
-        "params": {
-            **ensa_infos,
-            "type": "etd",
-            "id": "*",
-        },
-    },
-
-]
 
 
 async def main():
