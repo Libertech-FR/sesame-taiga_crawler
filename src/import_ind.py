@@ -1,11 +1,14 @@
 import asyncio
 import json
+import logging
 import os
 from lib.data_weaver3 import weave_entry
 import aiohttp
 import dotenv
 import yaml
 import re
+
+logger = logging.getLogger(__name__)
 
 dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
@@ -100,7 +103,7 @@ async def send_request(session, url,exclusions, json, force):
 async def get_data(data, config):
     result = []
     for entry in data:
-        treated = await weave_entry(entry, config)
+        treated = weave_entry(entry, config)
         result.append(treated)
     return result
 
@@ -118,19 +121,75 @@ async def process_data(data, config, file, session, force):
 async def load_config():
     config_file=os.getenv('CONFIG_FILE_TRANSFORM','./config.yml')
     with open(config_file, 'r', encoding='utf-8') as fichier:
-        return yaml.load(fichier, Loader=yaml.FullLoader)
+        docs = [doc for doc in yaml.safe_load_all(fichier) if doc is not None]
+
+    if not docs:
+        return {}
+
+    if len(docs) == 1:
+        if not isinstance(docs[0], dict):
+            raise ValueError(f"Invalid config format in {config_file}: expected mapping")
+        return docs[0]
+
+    merged: dict = {}
+    for idx, doc in enumerate(docs, start=1):
+        if not isinstance(doc, dict):
+            raise ValueError(f"Invalid config format in {config_file} (document #{idx}): expected mapping")
+        merged.update(doc)
+    return merged
+
+def _load_cache_datas(cache_dir: str, configs: dict) -> dict:
+    """Load and return the 'data' payload of each cache file listed in configs.
+
+    Files that don't exist, are empty, or contain invalid JSON are logged as
+    warnings and skipped so one corrupted cache file doesn't abort the whole
+    import run. Files in cache_dir that aren't mentioned in configs are ignored
+    silently.
+
+    Args:
+        cache_dir: Path to the directory containing cache JSON files.
+        configs: Mapping from cache filename to its transformation config.
+
+    Returns:
+        dict: {filename: data_list} for each successfully loaded file.
+    """
+    datas: dict = {}
+    try:
+        cache_files = os.listdir(cache_dir)
+    except FileNotFoundError:
+        logger.warning("Cache directory %s does not exist", cache_dir)
+        return datas
+
+    for file in cache_files:
+        if file not in configs:
+            continue
+        path = os.path.join(cache_dir, file)
+        try:
+            with open(path, 'r', encoding='utf-8') as fh:
+                payload = json.load(fh)
+        except json.JSONDecodeError as e:
+            logger.warning("Skipping %s: invalid JSON (%s)", path, e)
+            continue
+        except OSError as e:
+            logger.warning("Skipping %s: read error (%s)", path, e)
+            continue
+        if not isinstance(payload, dict):
+            logger.warning("Skipping %s: expected dict payload, got %s", path, type(payload).__name__)
+            continue
+        data = payload.get('data')
+        if not data:
+            logger.warning("Skipping %s: missing or empty 'data' key", path)
+            continue
+        datas[file] = data
+        print(f"Loaded {file}")
+    return datas
+
 
 async def import_ind(force: bool):
     configs = await load_config()
-    cache_files = os.listdir('./cache')
-    datas = {}
-    for file in cache_files:
-        if file in configs.keys():
-          print(f"Loading {file}, keys: {configs.keys()}")
-          with open(f'./cache/{file}', 'r', encoding='utf-8') as fichier:
-              datas[file] = json.load(fichier).get('data')
+    datas = _load_cache_datas('./cache', configs)
 
     connector = aiohttp.TCPConnector(ssl=False)
     async with aiohttp.ClientSession(connector=connector) as session:
-        tasks = [process_data(datas[file], configs[file], file, session, force) for file in cache_files if file in configs.keys()]
+        tasks = [process_data(datas[file], configs[file], file, session, force) for file in datas]
         await gather_with_concurrency(sesame_import_parallels_files, tasks)

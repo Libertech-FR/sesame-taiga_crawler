@@ -165,10 +165,19 @@ async def main():
         for col in collections:
             col.get('params')['au']=annee_en_cours
 
-    if args.run == 'taiga' or args.run == 'all':
-        logger.info("Starting Taiga ind/pictures crawler...")
+    source = os.getenv('SOURCE', 'TAIGA').strip().lower()
+    run_taiga = args.run in ('taiga', 'all') and source == 'taiga'
+    run_oasys = args.run in ('oasys', 'all') and source == 'oasys'
+
+    if args.run == 'taiga' and source != 'taiga':
+        logger.warning("Le run 'taiga' est ignoré car SOURCE n'est pas TAIGA.")
+    if args.run == 'oasys' and source != 'oasys':
+        logger.warning("Le run 'oasys' est ignoré car SOURCE n'est pas OASYS.")
+
+    if run_taiga or run_oasys:
+        logger.info("Starting source export crawler...")
         print(f"Imports: {args.imports}")
-        if (os.getenv('SOURCE','TAIGA') == 'TAIGA'):
+        if run_taiga:
             await a_moins_b(url, 0, -1, headers)
         # suppression des fichiers cache
         listjson=glob.glob('./cache/*.json')
@@ -183,7 +192,7 @@ async def main():
            collection_tasks = [col.get('function')(url, col, headers) for col in collections]
 
         await asyncio.gather(*collection_tasks)
-        print("Taiga crawler ended successful !!!")
+        print("Source export crawler ended successful !!!")
     if args.run == 'sesame' or args.run == 'all':
         print("Starting import_ind/pictures...")
         print(f"Imports: {args.imports}")

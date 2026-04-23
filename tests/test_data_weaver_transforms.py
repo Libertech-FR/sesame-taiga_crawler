@@ -34,6 +34,24 @@ class TestDataWeaverTransforms(unittest.TestCase):
         parsed = parse_transform("parse_type(typename='str')", value)
         self.assertEqual(parsed, "12345")
 
+    def test_join_skips_none_values(self):
+        result = parse_transform("join(delimiter=' ')", ["Alice", None, "Doe"])
+        self.assertEqual(result, "Alice Doe")
+
+    def test_join_skips_empty_strings(self):
+        result = parse_transform("join(delimiter='-')", ["a", "", "b"])
+        self.assertEqual(result, "a-b")
+
+    def test_parse_function_call_invalid_raises(self):
+        with self.assertRaises(ValueError):
+            parse_function_call("(")
+
+    def test_parse_transform_unknown_logs_warning(self):
+        with self.assertLogs("lib.data_weaver3.transforms", level="WARNING") as cm:
+            result = parse_transform("does_not_exist", "payload")
+        self.assertEqual(result, "payload")
+        self.assertTrue(any("does_not_exist" in msg for msg in cm.output))
+
 
 if __name__ == "__main__":
     unittest.main()

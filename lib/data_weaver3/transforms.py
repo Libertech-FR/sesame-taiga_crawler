@@ -1,8 +1,10 @@
-
+import logging
 import re
 import typing
-from typing import Any, Callable, Dict
 import unicodedata
+from typing import Any, Callable, Dict
+
+logger = logging.getLogger(__name__)
 
 def apply_to_value(value, func, *args, **kwargs):
     if isinstance(value, dict):
@@ -23,7 +25,7 @@ def concat(values: list, delimiter=' ') -> str:
     else:
         raise TypeError("All values in concat must be strings")
 
-def parse_type(value, typename: str) -> type:
+def parse_type(value, typename: str) -> Any:
     try:
         # Mapping string to actual type
         type_map = {
@@ -52,13 +54,7 @@ def split(value: str, delimiter: str = ' ') -> list:
     return value.split(delimiter)
 
 def join(values: list, delimiter: str = ' ') -> str:
-    r=[]
-    for v in values:
-        if v is None:
-            r.append(r)
-        elif v != '':
-            r.append(v)
-    return delimiter.join(r)
+    return delimiter.join(str(v) for v in values if v is not None and v != '')
 
 def lower(value: typing.Union[str,list,dict]) -> str:
     def lower_val(val):
@@ -155,35 +151,22 @@ def parse_args(args: str) -> dict:
 
     return kwargs
 
-def parse_function_call(call_str):
-    # Define the regex pattern
-    pattern = re.compile(r"(\w+)(?:\((.*)\))?")
-    match = pattern.match(call_str)
-
+def parse_function_call(call_str: str) -> tuple[str, dict]:
+    match = re.compile(r"(\w+)(?:\((.*)\))?").match(call_str)
     if not match:
-        print(f"Invalid function call: {call_str}")
-
+        raise ValueError(f"Invalid function call: {call_str!r}")
     func_name = match.group(1)
     args_str = match.group(2)
-
-    if args_str is None:
-        # No arguments, return empty list for args
-        return func_name, {}
-
-    kwargs = parse_args(args_str)
-    return func_name, kwargs
+    return func_name, (parse_args(args_str) if args_str is not None else {})
 
 def parse_transform(transform: str, value: Any) -> Any:
-    # func_name, *args = transform.replace(")", "").split("(")
     func_name, kwargs = parse_function_call(transform)
     func = TRANSFORMATIONS.get(func_name)
     if not func:
-        print(f"Invalid transform function: {func_name} for value: {value}")
+        logger.warning("Unknown transform %r; passing value through", func_name)
         return value
-    try :
-        # kwargs = parse_args(args)
+    try:
         return func(value, **kwargs)
-    except Exception as e:
-        print(e)
-        print(f"Error in transform function: {func_name} for value: {value} with args: {kwargs}")
+    except (TypeError, ValueError, KeyError, re.error) as e:
+        logger.warning("Transform %s(%r) on %r failed: %s", func_name, kwargs, value, e)
         return value

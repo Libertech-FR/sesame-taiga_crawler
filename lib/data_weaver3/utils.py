@@ -1,4 +1,16 @@
-def crush(nested_dict, parent_key='', sep='.'):
+def crush(nested_dict: dict | list, parent_key: str = '', sep: str = '.') -> dict:
+    """Flatten a nested dict/list into a single-level dict with dotted keys.
+
+    Lists produce numeric path segments: ``{"a": [1, 2]} -> {"a.0": 1, "a.1": 2}``.
+
+    Args:
+        nested_dict: The nested structure to flatten.
+        parent_key: Prefix applied to keys at this recursion level (internal).
+        sep: Separator used between path segments.
+
+    Returns:
+        A flat dict keyed by dotted paths.
+    """
     items = []
     if isinstance(nested_dict, list):
         for i, value in enumerate(nested_dict):
@@ -16,13 +28,23 @@ def crush(nested_dict, parent_key='', sep='.'):
                 items.append((new_key, value))
     return dict(items)
 
-def construct(flat_dict):
-    def recursive_construct(paths, value, base, depth=0):
-        # Base case: set the value at the end of the path
+
+def construct(flat_dict: dict) -> dict:
+    """Rebuild a nested dict/list from a flat dict with dotted keys.
+
+    Inverse of :func:`crush`. Numeric path segments become list indices;
+    non-numeric segments become dict keys.
+
+    Args:
+        flat_dict: Flat mapping keyed by dotted paths.
+
+    Returns:
+        The reconstructed nested structure.
+    """
+    def recursive_construct(paths, value, base):
         if len(paths) == 1:
             if isinstance(base, list):
                 index = int(paths[0])
-                # Ensure the list is long enough
                 while len(base) <= index:
                     base.append(None)
                 base[index] = value
@@ -30,14 +52,11 @@ def construct(flat_dict):
                 base[paths[0]] = value
             return
 
-        # Determine the current path part and whether it's an index for a list
         current_path, rest_paths = paths[0], paths[1:]
         is_index = current_path.isdigit()
 
-        # Prepare the next level base (either dict or list)
         if is_index:
             current_path = int(current_path)
-            # Ensure the list is long enough and correctly initialized
             while len(base) <= current_path:
                 base.append([] if rest_paths and rest_paths[0].isdigit() else {})
             next_base = base[current_path]
@@ -46,12 +65,9 @@ def construct(flat_dict):
                 base[current_path] = [] if rest_paths and rest_paths[0].isdigit() else {}
             next_base = base[current_path]
 
-        # Recursive call to construct the next level
-        recursive_construct(rest_paths, value, next_base, depth + 1)
+        recursive_construct(rest_paths, value, next_base)
 
-    # Root of the constructed structure
-    result = {}
+    result: dict = {}
     for key, value in flat_dict.items():
-        paths = key.split('.')
-        recursive_construct(paths, value, result)
+        recursive_construct(key.split('.'), value, result)
     return result

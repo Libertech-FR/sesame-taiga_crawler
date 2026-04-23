@@ -1,130 +1,134 @@
-import json
-import asyncio
-import aiofiles
-from yaml import CLoader as Loader
-from lib.data_weaver3.utils import crush, construct
-from lib.data_weaver3.transforms import parse_transform
 import csv
-import yaml
+import json
+import logging
 import os
 
-config = {}
+import yaml
 
-def handle_value(data, source_key, target_key, default=False):
-    """
-    Handles the value of the given key in the data dictionary.
+from lib.data_weaver3.transforms import parse_transform
+from lib.data_weaver3.utils import construct, crush
+
+logger = logging.getLogger(__name__)
+
+
+def _validate_config(cfg: dict) -> dict:
+    """Validate a config dict in place.
+
+    Ensures `mapping` is present and defaults `additionalFields` to `{}`.
 
     Args:
-        data (dict): The data dictionary.
-        source_key (str | dict | list): The source key to retrieve the value from.
-        target_key (str): The key to store the value in the final result.
-        default (bool, optional): Whether to handle default values. Defaults to True.
+        cfg: The configuration dict to validate.
+
+    Returns:
+        dict: The same dict, with `additionalFields` defaulted if missing.
+
+    Raises:
+        ValueError: If `mapping` is missing.
+    """
+    if cfg.get('mapping') is None:
+        raise ValueError("Invalid config: missing 'mapping'")
+    cfg.setdefault('additionalFields', {})
+    return cfg
+
+
+def _load_config_from_disk() -> dict:
+    """Load a YAML config from the path given by CONFIG_FILE_TRANSFORM (or ./config/config.yml)."""
+    path = os.getenv('CONFIG_FILE_TRANSFORM', './config/config.yml')
+    with open(path, 'r', encoding='utf8') as fh:
+        return yaml.safe_load(fh)
+
+
+def _resolve_config(config: dict | None) -> dict:
+    """Return a validated copy of the config, loading from disk when None.
+
+    The returned dict is a shallow copy — callers can pass their own config without
+    risking mutation from downstream helpers.
+    """
+    if config is None:
+        config = _load_config_from_disk()
+    return _validate_config(dict(config))
+
+
+def _handle_value(data: dict, source_key, target_key: str, config: dict, default: bool = False):
+    """Resolve the value for the given target_key from data, dispatching on source_key shape.
+
+    Args:
+        data: The flattened input dictionary.
+        source_key (str | dict | list): The key(s) to read from data. When a dict, the
+            returned value is a dict of sub-results; when a list, a list of sub-results.
+        target_key: The target key being written to — used to look up transforms/defaults.
+        config: The resolved configuration.
+        default: When True, missing/falsy values fall back to the configured default.
+
+    Returns:
+        Any: The resolved (and optionally transformed) value.
     """
     def get_value_with_default(src_key):
-        """
-        Retrieves the value of the given key from the data dictionary.
-
-
-        Args:
-            src_key (str): The key to retrieve the value for.
-
-        Returns:
-            Any: The value of the key.
-            Bool: Whether the value is a default value.
-        """
+        """Return (value, is_default) for a single source key."""
         value = data.get(src_key)
         if not value and default:
-            return handle_default_value(data, target_key), True
+            return _handle_default_value(data, target_key, config), True
         return value, False
 
-    def handle_dict(source_key: dict):
-        """
-
-        Handles the dictionary value of the given key in the data dictionary.
-
-        Args:
-            source_key (dict): The key to retrieve the value from.
-
-        Returns:
-            dict: The handled dictionary.
-
-        """
-        handled_dict, is_default = {sub_key: get_value_with_default(sub_key)[0] for sub_key in source_key}, any(get_value_with_default(sub_key)[1] for sub_key in source_key)
+    def handle_dict(src: dict):
+        """Handle a dict-shaped source_key: {sub_key: value, ...}."""
+        handled = {sub: get_value_with_default(sub)[0] for sub in src}
+        is_default = any(get_value_with_default(sub)[1] for sub in src)
         if is_default:
-            return handled_dict
-        return transform_value(handled_dict, target_key)
+            return handled
+        return _transform_value(handled, target_key, config)
 
-    def handle_list(source_key: list):
-        """
-        Handles the list value of the given key in the data dictionary.
-
-        Args:
-            source_key (list): The key to retrieve the value from.
-
-        Returns:
-            list: The handled list.
-
-        """
-        handled_list, is_default = [get_value_with_default(sub_key)[0] for sub_key in source_key], all(get_value_with_default(sub_key)[1] for sub_key in source_key)
+    def handle_list(src: list):
+        """Handle a list-shaped source_key: [value_for_sub_key_0, value_for_sub_key_1, ...]."""
+        handled = [get_value_with_default(sub)[0] for sub in src]
+        is_default = all(get_value_with_default(sub)[1] for sub in src)
         if is_default:
-            return handled_list
-        return transform_value(handled_list, target_key)
+            return handled
+        return _transform_value(handled, target_key, config)
 
-    def handle_default(source_key):
-        """
-        Handles the default value for the given key.
-
-        Args:
-            source_key (str): The key to retrieve the value from.
-
-        Returns:
-            Any: The handled value.
-        """
-        handled_value, is_default = get_value_with_default(source_key)
+    def handle_scalar(src):
+        """Handle a scalar source_key (plain string)."""
+        handled, is_default = get_value_with_default(src)
         if is_default:
-            return handled_value
-        return transform_value(handled_value, target_key)
+            return handled
+        return _transform_value(handled, target_key, config)
 
-    type_handlers = {
-        dict: handle_dict,
-        list: handle_list,
-    }
+    if isinstance(source_key, dict):
+        return handle_dict(source_key)
+    if isinstance(source_key, list):
+        return handle_list(source_key)
+    return handle_scalar(source_key)
 
-    handler = type_handlers.get(type(source_key), handle_default)
-    value = handler(source_key)
-    return value
 
-def handle_default_value(data, target_key):
+def _handle_default_value(data: dict, target_key: str, config: dict):
+    """Resolve the default value for target_key from the config's `default` section.
+
+    Prefers `default.dynamic` (a source key to read from data, then transform) over
+    `default.static` (a literal value). Returns None when neither is configured.
     """
-    Handles the default value for the given key.
+    dynamic_key = config.get('default', {}).get('dynamic', {}).get(target_key)
+    if dynamic_key is not None:
+        value = _handle_value(data, dynamic_key, target_key, config, False)
+        return _transform_value(value, target_key, config, True)
 
-    Args:
-        data (dict): The data dictionary.
-        key (str): The key to retrieve the default value for.
-    """
-    default_source_key = config.get('default', {}).get('dynamic', {}).get(target_key)
-    if default_source_key is not None:
-        value = handle_value(data, default_source_key, target_key, False)
-        return transform_value(value, target_key, True)
-
-    default_source_value = config.get('default', {}).get('static', {}).get(target_key)
-    if default_source_value is not None:
-        return default_source_value
+    static_value = config.get('default', {}).get('static', {}).get(target_key)
+    if static_value is not None:
+        return static_value
 
     return None
 
 
-def transform_value(value, field, default=False):
-    """
-    Transforms the given value based on the configuration.
+def _transform_value(value, field: str, config: dict, default: bool = False):
+    """Apply the configured transform(s) for the given field to value.
 
     Args:
-        value (Any): The value to transform.
-        field (str): The field name.
-        default (bool, optional): Whether to use the default configuration. Defaults to False.
+        value: The value to transform.
+        field: The target field name (key into `config['transforms']`).
+        config: The resolved configuration.
+        default: When True, reads from `config['default']['transforms']` instead.
 
     Returns:
-        Any: The transformed value.
+        Any: The transformed value, or value unchanged when no transform is configured.
     """
     if default:
         transform = config.get('default', {}).get('transforms', {}).get(field)
@@ -140,126 +144,93 @@ def transform_value(value, field, default=False):
         return parse_transform(transform, value)
     return value
 
-async def map_fields(data: dict, final_result):
-    """
-    Maps the fields of the data dictionary to the final_result dictionary based on the configuration.
-    Args:
-        data (dict): The input data dictionary.
-        final_result (dict): The dictionary to store the mapped key-value pairs.
 
-    Returns:
-        None
-    """
+def _map_fields(data: dict, final_result: dict, config: dict) -> None:
+    """Populate final_result from data using config['mapping'] and config['additionalFields']."""
+    for target_key, source_key in config['mapping'].items():
+        final_result[target_key] = _handle_value(data, source_key, target_key, config)
 
-    for key, source_key in config.get('mapping').items():
-        value = handle_value(data, source_key, key)
-        final_result[key] = value
+    for target_key, value in config['additionalFields'].items():
+        final_result[target_key] = value
 
-    for key, value in config.get('additionalFields').items():
-        final_result[key] = value
 
-async def process_entry(entry):
-    final_result = {}
-    flat_object = crush(entry)
-    await map_fields(flat_object, final_result)
+def _process_entry(entry: dict, config: dict) -> dict:
+    """Crush entry, map its fields, reconstruct a nested dict."""
+    final_result: dict = {}
+    _map_fields(crush(entry), final_result, config)
     return construct(final_result)
 
-async def process_entries(entries):
+
+def _process_entries(entries: list[dict], config: dict) -> list[dict]:
+    """Apply _process_entry to each entry."""
+    return [_process_entry(entry, config) for entry in entries]
+
+
+def save_result_to_file(result, file_path: str) -> None:
+    """Serialize result to disk; format is inferred from the file extension.
+
+    Supported extensions: .csv, .json, .yml, .yaml. Any other extension triggers a
+    warning and is written as JSON (with .json appended to the path to avoid
+    silently writing under the wrong extension).
+
+    For CSV, records are flattened via crush() and the header is the union of keys
+    across all rows (so sparse records don't lose columns).
     """
-    Process a list of entries asynchronously.
-
-    Args:
-        entries (list): A list of entries to process.
-
-    Returns:
-        list: A list of constructed objects.
-
-    """
-    final_list = []
-    tasks = [process_entry(entry) for entry in entries]
-    final_list = await asyncio.gather(*tasks)
-    return final_list
-
-async def load_config(configContent=None):
-    """
-    Loads the configuration from a JSON file.
-
-    Returns:
-        dict: The configuration dictionary.
-
-    """
-    config_file=os.getenv('CONFIG_FILE_TRANSFORM','./config/config.yml')
-    if configContent is None:
-        async with aiofiles.open(config_file, 'r', encoding='utf8') as file:
-            content = await file.read()
-            configContent = yaml.load(content, Loader=Loader)
-    config.update(configContent)
-
-    if config.get('mapping') is None:
-        raise Exception('Invalid config file!')
-    if config.get('additionalFields') is None:
-        config['additionalFields'] = {}
-
-async def save_result_to_file(result, file_path):
-    # Determine the file extension
     _, ext = os.path.splitext(file_path)
     ext = ext.lower()
-
-    if ext not in ['.csv', '.json', '.yml', '.yaml']:
-        print('Invalid file extension. Defaulting to JSON.')
+    if ext not in {'.csv', '.json', '.yml', '.yaml'}:
+        logger.warning("Invalid file extension %r; defaulting to JSON", ext)
         ext = '.json'
+        file_path = f"{file_path}.json"
 
-    # Asynchronously write the result to the file based on the extension
-    async with aiofiles.open(file_path, 'w', encoding='utf-8') as file:
-        if ext == '.csv':
-            # Convert the result dict to CSV format
-            # Assuming result is a list of dictionaries
-            writer = csv.DictWriter(file, fieldnames=crush(result[0]).keys())
-            await writer.writeheader()
-            for row in result:
-                flat_row = crush(row)
-                await writer.writerow(flat_row)
-        elif ext == '.yml' or ext == '.yaml':
-            # Convert the result dict to YAML format
-            yaml_data = yaml.dump(result, allow_unicode=True)
-            await file.write(yaml_data)
-        else:  # Default to JSON
-            await file.write(json.dumps(result, ensure_ascii=False))
+    if ext == '.csv':
+        rows = result if isinstance(result, list) else [result]
+        flat_rows = [crush(row) for row in rows]
+        if not flat_rows:
+            open(file_path, 'w').close()
+            return
+        fieldnames = sorted({k for r in flat_rows for k in r})
+        with open(file_path, 'w', newline='', encoding='utf-8') as fh:
+            writer = csv.DictWriter(fh, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(flat_rows)
+        return
 
-async def weave_entry(data, config, *args, **kwargs):
-    """
-    Weaves the data with the given configuration.
+    with open(file_path, 'w', encoding='utf-8') as fh:
+        if ext in {'.yml', '.yaml'}:
+            yaml.dump(result, fh, allow_unicode=True)
+        else:
+            json.dump(result, fh, ensure_ascii=False)
+
+
+def weave_entry(data: dict, config: dict | None = None, *, file_path: str | None = None) -> dict:
+    """Weave a single entry through the configured mapping and transforms.
 
     Args:
-        data (dict): The input data.
-        config (dict): The configuration.
+        data: The input record.
+        config: The transformation config. When None, it's loaded from the path in
+            the CONFIG_FILE_TRANSFORM env var (default ./config/config.yml).
+        file_path: Optional output path — when set, the result is also written to
+            disk via save_result_to_file().
 
     Returns:
-        dict: The weaved data.
+        dict: The woven (mapped + transformed + reconstructed) record.
     """
-    await load_config(config)
-    result = await process_entry(data)
-
-    if 'file_path' in kwargs and isinstance(kwargs['file_path'], str):
-        await save_result_to_file(result, kwargs['file_path'])
-
+    cfg = _resolve_config(config)
+    result = _process_entry(data, cfg)
+    if file_path:
+        save_result_to_file(result, file_path)
     return result
 
-async def weave_entries(data: list[dict], config: dict, *args, **kwargs):
-    """
-    Weaves the data with the given configuration.
 
-    Args:
-        data (dict): The input data.
-        config (dict): The configuration.
+def weave_entries(data: list[dict], config: dict | None = None, *, file_path: str | None = None) -> list[dict]:
+    """Weave a list of entries. See weave_entry() for argument semantics.
 
     Returns:
-        dict: The weaved data.
+        list[dict]: The list of woven records, in input order.
     """
-    await load_config(config)
-    result = await process_entries(data)
-
-    if 'file_path' in kwargs and isinstance(kwargs['file_path'], str):
-        await save_result_to_file(result, kwargs['file_path'])
-
+    cfg = _resolve_config(config)
+    result = _process_entries(data, cfg)
+    if file_path:
+        save_result_to_file(result, file_path)
     return result

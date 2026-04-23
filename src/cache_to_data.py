@@ -8,7 +8,22 @@ from lib.data_weaver3 import weave_entry
 
 def load_transform_configs(config_path: Path) -> dict:
     with config_path.open("r", encoding="utf-8") as fh:
-        return yaml.safe_load(fh) or {}
+        docs = [doc for doc in yaml.safe_load_all(fh) if doc is not None]
+
+    if not docs:
+        return {}
+
+    if len(docs) == 1:
+        if not isinstance(docs[0], dict):
+            raise ValueError(f"Invalid config format in {config_path}: expected mapping")
+        return docs[0]
+
+    merged: dict = {}
+    for idx, doc in enumerate(docs, start=1):
+        if not isinstance(doc, dict):
+            raise ValueError(f"Invalid config format in {config_path} (document #{idx}): expected mapping")
+        merged.update(doc)
+    return merged
 
 
 async def convert_cache_file_to_data(cache_file: Path, config: dict) -> list[dict]:
@@ -16,7 +31,7 @@ async def convert_cache_file_to_data(cache_file: Path, config: dict) -> list[dic
     entries = payload.get("data", [])
     result: list[dict] = []
     for entry in entries:
-        result.append(await weave_entry(entry, config))
+        result.append(weave_entry(entry, config))
     return result
 
 
