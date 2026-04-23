@@ -358,7 +358,7 @@ make update-reqs
 ├── src/
 │   ├── a_moins_b.py                  # check de cohérence API Taiga (AmoinsB)
 │   ├── export_ind.py                 # extrait les individus Taiga → cache/taiga_*.json
-│   ├── export_oasis.py               # extrait les étudiants OASYS → cache/oasys_etd.json
+│   ├── export_oasys.py               # extrait les étudiants OASYS → cache/oasys_etd.json
 │   ├── export_pictures.py            # extrait les photos Taiga (base64 → jpg)
 │   ├── cache_to_data.py              # lit config.yml et transforme cache/ → data/
 │   ├── data_utils.py                 # utilitaires de filtrage + fingerprint

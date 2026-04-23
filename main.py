@@ -11,7 +11,7 @@ import argparse
 from src.a_moins_b import a_moins_b
 from src.export_ind import export_ind
 from src.export_pictures import export_pictures
-from src.export_oasis import export_oasis
+from src.export_oasys import export_oasys
 from src.import_ind import import_ind
 from src.import_pictures import import_pictures
 
@@ -124,7 +124,7 @@ else:
     url=os.getenv('STC_API_BASEURL', '')
     collections = [
         {
-            "function": export_oasis,
+            "function": export_oasys,
             "method": "student",
             "params": {
                 **ensa_infos,
