@@ -1,0 +1,17 @@
+name: Tests on Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run test suite
+        run: make test
