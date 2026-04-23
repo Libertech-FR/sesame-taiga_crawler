@@ -9,7 +9,7 @@ STC_RUN = "all"
 STC_IMPORTS = "all"
 STC_FORCE = "0"
 STC_AN = "0"
-include .env
+-include .env
 
 .DEFAULT_GOAL := help
 help:
