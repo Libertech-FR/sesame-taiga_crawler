@@ -44,11 +44,13 @@ test: ## Lance les tests unitaires via Docker
 	@mkdir -p ./tests_artifacts/cache_mocks ./tests_artifacts/data
 	@docker run --rm \
 		--platform $(PLATFORM) \
+		--user $(shell id -u):$(shell id -g) \
 		-v $(CURDIR):/data \
-		sesame-taiga-crawler-test:local python src/mock_cache_data.py --cache-dir ./cache --output-dir ./tests_artifacts/cache_mocks --size 8 --seed 42
+		sesame-taiga-crawler-test:local python src/mock_cache_data.py --cache-dir ./tests_integration/cache --output-dir ./tests_artifacts/cache_mocks --size 8 --seed 42
 	@printf "\033[33mTEST:\033[0m Run unit tests in Docker ...\n"
 	@docker run --rm \
 		--platform $(PLATFORM) \
+		--user $(shell id -u):$(shell id -g) \
 		-e TEST_MOCK_CACHE_DIR=./tests_artifacts/cache_mocks \
 		-e TEST_DATA_OUTPUT_DIR=./tests_artifacts/data \
 		-e TEST_CONFIG_PATH=./config.yml \
@@ -57,6 +59,7 @@ test: ## Lance les tests unitaires via Docker
 	@printf "\033[33mTEST:\033[0m Run integration fixtures test (tests_integration) ...\n"
 	@docker run --rm \
 		--platform $(PLATFORM) \
+		--user $(shell id -u):$(shell id -g) \
 		-v $(CURDIR):/data \
 		sesame-taiga-crawler-test:local python -m unittest tests.test_integration_fixtures
 	@printf "\033[33mTEST:\033[0m SUCCESSFUL !!!\n"
