@@ -38,14 +38,14 @@ def parse_type(value, typename: str) -> type:
     except KeyError:
         raise ValueError(f"Invalid type {typename}")
 
-def prefix(value: typing.Union[str,list,dict], prefix: str) -> str:
+def prefix(value: typing.Union[str,list,dict], string: str) -> str:
     def prefix_val(val):
-        return f"{prefix}{val}"
+        return f"{string}{val}"
     return apply_to_value(value, prefix_val)
 
-def suffix(value: typing.Union[str,list,dict], suffix: str) -> str:
+def suffix(value: typing.Union[str,list,dict], string: str) -> str:
     def suffix_val(val):
-        return f"{val}{suffix}"
+        return f"{val}{string}"
     return apply_to_value(value, suffix_val)
 
 def split(value: str, delimiter: str = ' ') -> list:
@@ -101,15 +101,15 @@ TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
     "title": title,
     "upper": upper,
     "remove_accents": remove_accents,
-    "concat": lambda value, delimiter='': concat(value, delimiter),
-    "parse_type": lambda value, typename: parse_type(value, typename),
-    "prefix": lambda value, string: prefix(value, string),
-    "suffix": lambda value, string: suffix(value, string),
-    "split": lambda value, delimiter=None: split(value, delimiter),
-    "join": lambda value, delimiter='': join(value, delimiter),
-    "replace": lambda value, old, new: replace(value, old, new),
-    "regex": lambda value, pattern, replace: regex(value, pattern, replace),
-    "substr": lambda value, start=0, end=-1: substr(value, start, end)
+    "concat": concat,
+    "parse_type": parse_type,
+    "prefix": prefix,
+    "suffix": suffix,
+    "split": split,
+    "join": join,
+    "replace": replace,
+    "regex": regex,
+    "substr": substr
 }
 
 def parse_args(args: str) -> dict:
