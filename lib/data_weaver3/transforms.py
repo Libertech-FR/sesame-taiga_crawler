@@ -3,7 +3,6 @@ import re
 import typing
 from typing import Any, Callable, Dict
 import unicodedata
-import ast
 
 def apply_to_value(value, func, *args, **kwargs):
     if isinstance(value, dict):

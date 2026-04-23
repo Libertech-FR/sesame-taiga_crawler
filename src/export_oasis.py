@@ -1,14 +1,12 @@
 import json
 import os
-import uuid
 import requests
 import logging
 import urllib3
-from logging import Logger
 
 urllib3.disable_warnings()
 logging.basicConfig(level=logging.INFO)
-logger: Logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 async def export_oasis(url, col, headers):

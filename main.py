@@ -9,9 +9,9 @@ from datetime import datetime
 import argparse
 
 from src.a_moins_b import a_moins_b
+from src.export_ind import export_ind
 from src.export_pictures import export_pictures
 from src.export_oasis import export_oasis
-from src.import_ind import import_ind
 from src.import_ind import import_ind
 from src.import_pictures import import_pictures
 
@@ -115,7 +115,11 @@ if( os.getenv('SOURCE','TAIGA') == 'TAIGA'):
             },
         },
     ]
-    print(ensa_infos)
+    masked_ensa_infos = {
+        **ensa_infos,
+        "pass_ensa": "****",
+    }
+    print(masked_ensa_infos)
 else:
     url=os.getenv('STC_API_BASEURL', '')
     collections = [

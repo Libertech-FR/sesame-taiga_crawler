@@ -3,7 +3,6 @@ import json
 import os
 import aiohttp
 import dotenv
-from src.data_utils import filter_datas
 
 dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
@@ -80,30 +79,17 @@ def list_files_in_dir(directory):
     return files
 
 async def import_pictures():
-    cache_files = os.listdir('./cache/pictures/files')
     datasCurrent = {}
-    datasOld = {}
     datas = {}
 
     files = list_files_in_dir('./cache/pictures')
 
     for file in files:
-    #     if file.endswith(".old"):
-    #         with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
-    #             datasOld[file.split('.')[0]] = json.load(fichier).get('data')
-    #     else:
         with open(f'./cache/pictures/{file}', 'r', encoding='utf-8') as fichier:
             datasCurrent[file.split('.')[0]] = json.load(fichier).get('data')
 
     for file in files:
-    #     if datasOld.get(file.split('.')[0]) is not None:
-    #         datas[file.split('.')[0]] = filter_datas(datasCurrent[file.split('.')[0]], datasOld[file.split('.')[0]])
-    #     else:
         datas[file.split('.')[0]] = datasCurrent[file.split('.')[0]]
-
-    # print(datasOld)
-    # print(datasCurrent)
-    # print(datas)
 
     connector = aiohttp.TCPConnector(ssl=False)
     async with aiohttp.ClientSession(connector=connector) as session:

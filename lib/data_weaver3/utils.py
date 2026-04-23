@@ -18,9 +18,6 @@ def crush(nested_dict, parent_key='', sep='.'):
 
 def construct(flat_dict):
     def recursive_construct(paths, value, base, depth=0):
-        # Debug output setup
-        indent = "  " * depth
-
         # Base case: set the value at the end of the path
         if len(paths) == 1:
             if isinstance(base, list):

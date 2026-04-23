@@ -11,3 +11,5 @@ lib/*
 config.yml
 .DS_Store
 tests_artifacts/
+__pycache__/
+*.py[cod]

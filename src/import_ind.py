@@ -29,7 +29,7 @@ async def read_response(response):
     print(jsonMessage)
 
 async def send_request(session, url,exclusions, json, force):
-    if (json.get('inetOrgPerson', {}).get('employeeNumber') == None and json.get('$setOnInsert', {}).get('inetOrgPerson', {}).get('employeeNumber') == None):
+    if (json.get('inetOrgPerson', {}).get('employeeNumber') is None and json.get('$setOnInsert', {}).get('inetOrgPerson', {}).get('employeeNumber') is None):
         print(f"MISSING employeeNumber -> $set: {json.get('inetOrgPerson', {})}, $setOnInsert: {json.get('$setOnInsert', {}).get('inetOrgPerson', {})}")
         return
 
@@ -69,7 +69,7 @@ async def send_request(session, url,exclusions, json, force):
 
             if value:
                 result = re.search(regex[r], value)
-                if result != None:
+                if result is not None:
                     print(f"EXCLUDED {json.get('inetOrgPerson', {}).get('employeeNumber')} {json.get('inetOrgPerson', {}).get('cn')}")
                     return
     try:
@@ -111,7 +111,6 @@ async def process_data(data, config, file, session, force):
     result = await get_data(data, config)
     with open(f'./data/{file}', 'w', encoding='utf-8') as fichier:
         json.dump(result, fichier, ensure_ascii=False, indent=4)
-    exclude=config.get('exclude',[])
     tasks = [send_request(session, f'{sesame_api_baseurl}/management/identities/upsert',config.get('exclude',[]),entry, force) for entry in result]
     await gather_with_concurrency(sesame_import_parallels_files, tasks)
     print(f"Processed {file}")

@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.11
-FROM python:${PYTHON_VERSION}-slim as base
+FROM python:${PYTHON_VERSION}-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -28,4 +28,4 @@ USER appuser
 
 COPY . .
 
-CMD python main.py
+CMD ["python", "main.py"]
