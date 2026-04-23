@@ -6,15 +6,11 @@ import base64
 import logging
 import urllib3
 from logging import Logger
+from src.data_utils import compare_fingerprints
 
 urllib3.disable_warnings()
 logging.basicConfig(level=logging.INFO)
 logger: Logger = logging.getLogger(__name__)
-
-def compare_fingerprints(current, new):
-    current_data = {(data['ident'], data['size'], data['date']) for data in current}
-    new_data = {(data['ident'], data['size'], data['date']) for data in new}
-    return new_data - current_data
 
 def copy_file(source, destination):
     with open(source, 'r', encoding='utf-8') as src_file:

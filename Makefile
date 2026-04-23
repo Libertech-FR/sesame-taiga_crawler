@@ -37,6 +37,30 @@ run-crawler-docker: ## Lance le crawler Sesame - Taiga avec python !
 run-crawler: ## Lance le crawler Sesame - Taiga avec python !
 	@python3 main.py
 
+test: ## Lance les tests unitaires via Docker
+	@printf "\033[33mTEST:\033[0m Build docker image for tests ...\n"
+	@docker build --platform $(PLATFORM) -t sesame-taiga-crawler-test:local .
+	@printf "\033[33mTEST:\033[0m Generate mock cache data ...\n"
+	@mkdir -p ./tests_artifacts/cache_mocks ./tests_artifacts/data
+	@docker run --rm \
+		--platform $(PLATFORM) \
+		-v $(CURDIR):/data \
+		sesame-taiga-crawler-test:local python src/mock_cache_data.py --cache-dir ./cache --output-dir ./tests_artifacts/cache_mocks --size 8 --seed 42
+	@printf "\033[33mTEST:\033[0m Run unit tests in Docker ...\n"
+	@docker run --rm \
+		--platform $(PLATFORM) \
+		-e TEST_MOCK_CACHE_DIR=./tests_artifacts/cache_mocks \
+		-e TEST_DATA_OUTPUT_DIR=./tests_artifacts/data \
+		-e TEST_CONFIG_PATH=./config.yml \
+		-v $(CURDIR):/data \
+		sesame-taiga-crawler-test:local python -m unittest discover -s tests -p "test_*.py"
+	@printf "\033[33mTEST:\033[0m Run integration fixtures test (tests_integration) ...\n"
+	@docker run --rm \
+		--platform $(PLATFORM) \
+		-v $(CURDIR):/data \
+		sesame-taiga-crawler-test:local python -m unittest tests.test_integration_fixtures
+	@printf "\033[33mTEST:\033[0m SUCCESSFUL !!!\n"
+
 install-deps: ## Installe les dépendances python
 	@printf "\033[33mPIP:\033[0m install required dependencies ...\n"
 	@pip install -r requirements.txt

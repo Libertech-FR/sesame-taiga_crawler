@@ -10,3 +10,4 @@ config.yml
 lib/*
 config.yml
 .DS_Store
+tests_artifacts/

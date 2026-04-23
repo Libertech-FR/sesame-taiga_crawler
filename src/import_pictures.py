@@ -3,6 +3,7 @@ import json
 import os
 import aiohttp
 import dotenv
+from src.data_utils import filter_datas
 
 dotenv.load_dotenv()
 sesame_api_baseurl = os.getenv('SESAME_API_BASEURL')
@@ -77,17 +78,6 @@ async def process_data(data, file, session):
 def list_files_in_dir(directory):
     files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
     return files
-
-def filter_datas(datasCurrent, datasOld):
-    datas = []
-    old_data_tuples = {(data['ident'], data['size'], data['date']) for data in datasOld}
-
-    for data in datasCurrent:
-        data_tuple = (data['ident'], data['size'], data['date'])
-        if data_tuple not in old_data_tuples:
-            datas.append(data)
-
-    return datas
 
 async def import_pictures():
     cache_files = os.listdir('./cache/pictures/files')

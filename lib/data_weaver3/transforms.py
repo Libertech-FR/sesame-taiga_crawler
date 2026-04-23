@@ -114,25 +114,43 @@ TRANSFORMATIONS: Dict[str, Callable[..., Any]] = {
 }
 
 def parse_args(args: str) -> dict:
+    if args is None or args.strip() == "":
+        return {}
     kwargs = {}
+    # Support:
+    # - comma separated kwargs: pattern='x', replace='y'
+    # - space separated kwargs: start=1 end=3
+    token_pattern = re.compile(
+        r"(\w+)\s*=\s*(.+?)(?:(?:\s*,\s*|\s+)(?=\w+\s*=)|$)"
+    )
 
-    # Regex pattern to match key-value pairs considering nested structures and quoted strings
-    pattern = re.compile(r"(\w+)=('(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\"|\([^)]*\)|\[[^\]]*\]|\{[^}]*\}|\S+)")
-
-    for match in pattern.finditer(args):
+    for match in token_pattern.finditer(args):
         key = match.group(1).strip()
         value = match.group(2).strip()
+        if not key:
+            continue
 
-        # Remove the outer quotes from strings, if they exist
-        if value.startswith(("'", '"')) and value.endswith(("'", '"')):
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
             value = value[1:-1]
-        else:
-            # Try to parse the value using ast.literal_eval for safety
-            try:
-                value = ast.literal_eval(value)
-            except (ValueError, SyntaxError):
-                # If parsing fails, keep the value as a string
-                value = str(value)
+            kwargs[key] = value
+            continue
+
+        if value == "":
+            kwargs[key] = ""
+            continue
+
+        lower_value = value.lower()
+        if lower_value in {"true", "false"}:
+            kwargs[key] = lower_value == "true"
+            continue
+
+        if re.fullmatch(r"-?\d+", value):
+            kwargs[key] = int(value)
+            continue
+
+        if re.fullmatch(r"-?\d+\.\d+", value):
+            kwargs[key] = float(value)
+            continue
 
         kwargs[key] = value
 

@@ -24,13 +24,27 @@ on:
         type: boolean
 
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run test suite
+        run: make test
+
   build:
+    needs: tests
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Build docker
         uses: Libertech-FR/lt-actions/release@main
         with:
