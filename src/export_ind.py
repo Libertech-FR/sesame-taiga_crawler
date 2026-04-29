@@ -11,6 +11,14 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 
 async def export_ind(url, col, headers):
+    # Optionnel : forcer l'en-tête Host (utile avec un rebond/forward et certains WAF).
+    # Active via STC_FORCE_HOST_HEADER=1 et valeur via STC_FORCE_HOST_HEADER_VALUE
+    # (sinon on prend STC_API_HOST).
+    force_host = os.getenv("STC_FORCE_HOST_HEADER", "0")
+    forced_host = os.getenv("STC_FORCE_HOST_HEADER_VALUE") or os.getenv("STC_API_HOST")
+    if forced_host and force_host.lower() in ("1", "true", "yes", "on"):
+        headers = {**headers, "Host": forced_host}
+
     payload = {
         "jsonrpc": "2.0",
         "method": col.get('method'),

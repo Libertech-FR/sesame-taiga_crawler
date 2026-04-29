@@ -28,6 +28,7 @@ pull-crawler-docker: ## Pull l'image docker
 run-crawler-docker: ## Lance le crawler Sesame - Taiga avec python !
 	@docker run --rm -it \
 		--add-host host.docker.internal:host-gateway \
+		--add-host $(STC_API_HOST):$(STC_API_TARGET) \
 		--network dev \
 		--platform $(PLATFORM) \
 		--name $(APP_NAME) \

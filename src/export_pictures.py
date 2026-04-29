@@ -11,6 +11,11 @@ logging.basicConfig(level=logging.INFO)
 logger: logging.Logger = logging.getLogger(__name__)
 
 async def export_pictures(url, col, headers):
+    force_host = os.getenv("STC_FORCE_HOST_HEADER", "0")
+    forced_host = os.getenv("STC_FORCE_HOST_HEADER_VALUE") or os.getenv("STC_API_HOST")
+    if forced_host and force_host.lower() in ("1", "true", "yes", "on"):
+        headers = {**headers, "Host": forced_host}
+
     params = {k: v for k, v in col.get("params", {}).items() if k != "au"}
     payload = {
         "jsonrpc": "2.0",
@@ -54,6 +59,11 @@ async def export_pictures(url, col, headers):
 
 
 async def export_picture(url, col, headers, id):
+    force_host = os.getenv("STC_FORCE_HOST_HEADER", "0")
+    forced_host = os.getenv("STC_FORCE_HOST_HEADER_VALUE") or os.getenv("STC_API_HOST")
+    if forced_host and force_host.lower() in ("1", "true", "yes", "on"):
+        headers = {**headers, "Host": forced_host}
+
     payload = {
         "jsonrpc": "2.0",
         "method": col.get('methodBase64'),
