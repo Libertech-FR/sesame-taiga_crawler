@@ -29,9 +29,16 @@ async def export_ind(url, col, headers):
         response.raise_for_status()
         if response.text == 'ko!':
             raise Exception("ko!")
-        elif not response.json()['result']['output']:
-            raise Exception("Empty response from ExportInd", response.json())
-        data = response.json()['result']['output']
+        response_json = response.json()
+        output = response_json.get('result', {}).get('output')
+        if not output:
+            logger.warning(
+                "Empty response from ExportInd (type=%s, au=%s). Skipping.",
+                payload['params'].get('type'),
+                payload['params'].get('au'),
+            )
+            return
+        data = output
         os.makedirs(f'./cache', exist_ok=True)
         with open(f'./cache/taiga_{col.get("params")["type"]}.json', 'w', encoding='utf-8') as fichier:
             json.dump(
