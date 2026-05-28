@@ -63,7 +63,15 @@ Le flux d'exécution est le suivant :
 
 ## Configuration (`.env`)
 
-Créez un fichier `.env` à la racine du projet. Toutes les variables lues par le code sont listées ci‑dessous.
+Copiez le fichier d’exemple puis renseignez vos valeurs :
+
+```bash
+cp .env.example .env
+```
+
+> **Sécurité** — Ne commitez jamais votre `.env` (tokens / mots de passe). Le dépôt ignore déjà `.env` via `.gitignore`.
+
+Toutes les variables lues par le code sont listées ci‑dessous.
 
 | Variable | Obligatoire | Défaut | Rôle |
 |---|---|---|---|
