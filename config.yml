@@ -13,8 +13,11 @@ taiga_etd.json:
     inetOrgPerson.sn: "nom"
     inetOrgPerson.givenName: "prenom"
     additionalFields.attributes.supannPerson.supannPrenomsEtatCivil: "prenom"
+    # num_etd = numéro étudiant / code-barres (Unicampus) ; id_coord provoque des collisions de photos
     $setOnInsert.inetOrgPerson.employeeNumber:
-    - "id_coord"
+    - "num_etd"
+    inetOrgPerson.employeeNumber:
+    - "num_etd"
     customFields.photo: "photo_nom"
     $setOnInsert.inetOrgPerson.uid:
     - "prenom"
