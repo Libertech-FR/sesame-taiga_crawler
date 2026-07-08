@@ -1,4 +1,4 @@
-def crush(nested_dict: dict | list, parent_key: str = '', sep: str = '.') -> dict:
+def crush(nested_dict: dict or list, parent_key: str = '', sep: str = '.') -> dict:
     """Flatten a nested dict/list into a single-level dict with dotted keys.
 
     Lists produce numeric path segments: ``{"a": [1, 2]} -> {"a.0": 1, "a.1": 2}``.

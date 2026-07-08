@@ -28,7 +28,7 @@ joined_auth = ':'.join(map(str, basic_auth)).encode('utf-8')
 ensa_infos={}
 ensa_pass=""
 collections=[]
-if( os.getenv('SOURCE','TAIGA') == 'TAIGA'):
+if( os.getenv('SOURCE','taiga').lower() == 'taiga'):
     url = f"{os.getenv('STC_API_BASEURL', 'https://taiga.archi.fr')}/taiga_libext/JsonRPC/api.php"
     ensa_pass = os.getenv('STC_API_PASSENSA') + datetime.now().strftime('%Y%m%d')
     ensa_infos = {
