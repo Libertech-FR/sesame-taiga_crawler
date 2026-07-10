@@ -38,7 +38,7 @@ if( os.getenv('SOURCE','taiga').lower() == 'taiga'):
     collections = [
         {
             "function": export_ind,
-            "method": "ExportInd",
+            "method": "ExportPrimo",
             "params": {
                 **ensa_infos,
                 "type": "pri",
