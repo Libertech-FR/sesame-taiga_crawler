@@ -29,7 +29,8 @@ ensa_infos={}
 ensa_pass=""
 collections=[]
 if( os.getenv('SOURCE','taiga').lower() == 'taiga'):
-    url = f"{os.getenv('STC_API_BASEURL', 'https://taiga.archi.fr')}/taiga_libext/JsonRPC/api.php"
+    path_api=os.getenv('STC_API_PATH', '/taiga_libext/JsonRPC/api.php')
+    url = f"{os.getenv('STC_API_BASEURL', 'https://taiga.archi.fr')}{path_api}"
     ensa_pass = os.getenv('STC_API_PASSENSA') + datetime.now().strftime('%Y%m%d')
     ensa_infos = {
         "code_ensa": os.getenv('STC_API_CODEENSA', 'lyon'),
